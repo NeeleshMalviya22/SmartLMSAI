@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartLMSAI.Domain", "SmartLMSAI.Domain\SmartLMSAI.Domain.csproj", "{DC6A7C62-1F0F-4354-9477-1456CE5BE54F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartLMSAI.Application", "SmartLMSAI.Application\SmartLMSAI.Application.csproj", "{C427C202-D8AC-4A19-8BA4-BECD6B0E2893}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartLMSAI.Infrastructure", "SmartLMSAI.Infrastructure\SmartLMSAI.Infrastructure.csproj", "{A00061A6-FC76-4AA3-BCA6-706EFA6D0607}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartLMSAI.API", "SmartLMSAI.API\SmartLMSAI.API.csproj", "{CC8BB975-8FC1-401A-8081-72591899CAB7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC6A7C62-1F0F-4354-9477-1456CE5BE54F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC6A7C62-1F0F-4354-9477-1456CE5BE54F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC6A7C62-1F0F-4354-9477-1456CE5BE54F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC6A7C62-1F0F-4354-9477-1456CE5BE54F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C427C202-D8AC-4A19-8BA4-BECD6B0E2893}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C427C202-D8AC-4A19-8BA4-BECD6B0E2893}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C427C202-D8AC-4A19-8BA4-BECD6B0E2893}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C427C202-D8AC-4A19-8BA4-BECD6B0E2893}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A00061A6-FC76-4AA3-BCA6-706EFA6D0607}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A00061A6-FC76-4AA3-BCA6-706EFA6D0607}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A00061A6-FC76-4AA3-BCA6-706EFA6D0607}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A00061A6-FC76-4AA3-BCA6-706EFA6D0607}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC8BB975-8FC1-401A-8081-72591899CAB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC8BB975-8FC1-401A-8081-72591899CAB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC8BB975-8FC1-401A-8081-72591899CAB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC8BB975-8FC1-401A-8081-72591899CAB7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

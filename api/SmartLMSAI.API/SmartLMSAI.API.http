@@ -1,0 +1,6 @@
+@SmartLMSAI.API_HostAddress = http://localhost:5003
+
+GET {{SmartLMSAI.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
