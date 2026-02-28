@@ -48,7 +48,9 @@ public class AuthService : IAuthService
     {
         var userId = await _userRepository.ValidateUserAsync(dto.Email, dto.Password);
         if (userId == null)
+        {
             return ApiResponse<AuthResponseDto>.Fail("Invalid credentials");
+        }
 
         var roles = await _userRepository.GetRolesAsync(userId.Value);
         var role = roles.FirstOrDefault() ?? string.Empty;
@@ -59,11 +61,11 @@ public class AuthService : IAuthService
             new(ClaimTypes.Role, role)
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtSettings:Key"]!));
 
         var token = new JwtSecurityToken(
-            issuer: _config["Jwt:Issuer"],
-            audience: _config["Jwt:Audience"],
+            issuer: _config["JwtSettings:Issuer"],
+            audience: _config["JwtSettings:Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddHours(2),
             signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)

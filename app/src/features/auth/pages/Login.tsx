@@ -32,7 +32,6 @@ export default function Login() {
     try {
       setLoading(true);
       const res = await loginApi(form);
-      console.log(res.data.data.token);
       await saveAuth({
         token: res.data.data.token,
         role: res.data.data.role,

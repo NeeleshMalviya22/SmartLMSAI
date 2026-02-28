@@ -28,3 +28,8 @@ export const getRole = async () => {
 export const clearAuth = async () => {
   await localforage.removeItem(AUTH_KEY);
 };
+
+export const isLoggedIn = async (): Promise<boolean> => {
+  const token = await getToken();
+  return !!token; 
+};
