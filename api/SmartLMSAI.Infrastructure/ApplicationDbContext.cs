@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SmartLMSAI.Domain.Entities;
 
 namespace SmartLMSAI.Infrastructure;
 
@@ -11,4 +12,5 @@ public class ApplicationDbContext
         : base(options)
     {
     }
+    public DbSet<Course> Courses { get; set; }
 }

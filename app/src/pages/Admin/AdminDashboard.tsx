@@ -1,76 +1,139 @@
-import { Users, BookOpen, ClipboardList, BarChart3 } from "lucide-react";
+import {Card, Col, Row,
+  Progress,
+  Table,
+  Typography,
+  Space,
+} from "antd";
+import {
+  BookOutlined,
+  UserOutlined,
+  RiseOutlined,
+  BarChartOutlined,
+} from "@ant-design/icons";
+
+const { Title, Text } = Typography;
 
 export default function AdminDashboard() {
 
-  const StatCard = ({ title, value, Icon }: any) => (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border">
-      <div className="flex items-center gap-4">
-        <div className="bg-blue-50 p-3 rounded-xl">
-          <Icon className="text-blue-600" size={22} />
-        </div>
-        <div>
-          <p className="text-gray-500 text-sm">{title}</p>
-          <p className="text-3xl font-bold text-gray-800">{value}</p>
-        </div>
-      </div>
-    </div>
-  );
+  const stats = [
+    { title: "Total Courses", value: 12, icon: <BookOutlined /> },
+    { title: "Active Learners", value: 148, icon: <UserOutlined /> },
+    { title: "Avg Completion", value: "67%", icon: <RiseOutlined /> },
+    { title: "Avg Quiz Score", value: "79%", icon: <BarChartOutlined /> },
+  ];
+
+  const courses = [
+    { name: "ISO 9001 Quality Management", progress: 82 },
+    { name: "Workplace Safety & Compliance", progress: 65 },
+    { name: "Project Management Fundamentals", progress: 48 },
+    { name: "Customer Service Excellence", progress: 71 },
+    { name: "Cybersecurity Awareness", progress: 55 },
+  ];
+
+  const learners = [
+    { key: 1, name: "Sarah Roberts", course: "ISO 9001", progress: 82, status: "Completed" },
+    { key: 2, name: "James Walker", course: "Safety", progress: 60, status: "In Progress" },
+    { key: 3, name: "Maria Lopez", course: "Cybersecurity", progress: 40, status: "Pending" },
+  ];
+
+  const columns = [
+    { title: "Learner", dataIndex: "name" },
+    { title: "Course", dataIndex: "course" },
+    {
+      title: "Progress",
+      dataIndex: "progress",
+      render: (value: number) => <Progress percent={value} size="small" />,
+    },
+    { title: "Status", dataIndex: "status" },
+  ];
 
   return (
-    <div className="p-8">
+    <div style={{ padding: 24 }}>
 
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Admin Dashboard 👨‍💼
-        </h1>
-        <p className="text-gray-500">
-          Overview of platform performance and activity
-        </p>
-      </div>
+      <Title level={3}>Good morning, James 👋</Title>
+      <Text type="secondary">
+        Here's what's happening with your courses today.
+      </Text>
 
-      {/* Stats Section */}
-      <div className="grid md:grid-cols-4 gap-6 mb-10">
-        <StatCard title="Total Users" value="120" Icon={Users} />
-        <StatCard title="Total Courses" value="15" Icon={BookOpen} />
-        <StatCard title="Total Quizzes" value="42" Icon={ClipboardList} />
-        <StatCard title="Avg Score" value="78%" Icon={BarChart3} />
-      </div>
+      {/* Stats Cards */}
+      <Row gutter={[16, 16]} style={{ marginTop: 20 }}>
+        {stats.map((item, i) => (
+          <Col xs={24} sm={12} md={6} key={i}>
+            <Card>
+              <Space direction="vertical">
+                <Text type="secondary">{item.title}</Text>
+                <Title level={3} style={{ margin: 0 }}>
+                  {item.value}
+                </Title>
+                <div style={{ fontSize: 22, color: "#1677ff" }}>
+                  {item.icon}
+                </div>
+              </Space>
+            </Card>
+          </Col>
+        ))}
+      </Row>
 
-      {/* Recent Activity Table */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border">
-        <h2 className="text-xl font-semibold mb-4">
-          Recent Activities
-        </h2>
+      <Row gutter={[16, 16]} style={{ marginTop: 20 }}>
 
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b">
-              <th className="py-3">User</th>
-              <th>Course</th>
-              <th>Action</th>
-              <th>Date</th>
-            </tr>
-          </thead>
+        {/* LEFT SIDE */}
+        <Col xs={24} lg={16}>
+          
+          {/* Course Progress */}
+          <Card title="Course Progress" style={{ marginBottom: 16 }}>
+            {courses.map((c, i) => (
+              <div key={i} style={{ marginBottom: 12 }}>
+                <Space style={{ width: "100%", justifyContent: "space-between" }}>
+                  <Text>{c.name}</Text>
+                  <Text>{c.progress}%</Text>
+                </Space>
+                <Progress percent={c.progress} showInfo={false} />
+              </div>
+            ))}
+          </Card>
 
-          <tbody>
-            <tr className="border-b">
-              <td className="py-3">John Doe</td>
-              <td>React Fundamentals</td>
-              <td>Completed Quiz</td>
-              <td>Today</td>
-            </tr>
+          {/* Learner Activity */}
+          <Card title="Recent Learner Activity">
+            <Table
+              dataSource={learners}
+              columns={columns}
+              pagination={false}
+            />
+          </Card>
 
-            <tr>
-              <td className="py-3">Jane Smith</td>
-              <td>System Design</td>
-              <td>Enrolled</td>
-              <td>Yesterday</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+        </Col>
 
+        {/* RIGHT SIDE */}
+        <Col xs={24} lg={8}>
+
+          {/* Module Quiz Scores */}
+          <Card title="Module Quiz Scores" style={{ marginBottom: 16 }}>
+            {["M1", "M2", "M3", "M4", "M5", "M6"].map((m, i) => (
+              <div key={i} style={{ marginBottom: 10 }}>
+                <Text>{m}</Text>
+                <Progress percent={70} size="small" />
+              </div>
+            ))}
+          </Card>
+
+          {/* Completion Rates */}
+          <Card title="Completion Rates">
+            <Space size="large">
+              {[82, 65, 70].map((val, i) => (
+                <Progress
+                  key={i}
+                  type="circle"
+                  percent={val}
+                  width={80}
+                />
+              ))}
+            </Space>
+          </Card>
+
+        </Col>
+
+      </Row>
     </div>
   );
 }

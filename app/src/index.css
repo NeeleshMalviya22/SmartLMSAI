@@ -1,1 +1,11 @@
 @import "tailwindcss";
+@import "antd/dist/reset.css";
+.ant-menu-item-selected {
+  background-color: #e8f0fe !important;
+  color: #2563eb !important;
+  border-radius: 10px;
+  font-weight: 600;
+}
+body {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}

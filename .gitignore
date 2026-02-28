@@ -55,12 +55,6 @@ TestResults/
 *.mdf
 *.ldf
 
-############################################
-# App settings & secrets
-############################################
-appsettings.Development.json
-appsettings.Local.json
-.env
 
 ############################################
 # React / Vite (Frontend)

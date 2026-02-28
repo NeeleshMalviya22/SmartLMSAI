@@ -11,6 +11,7 @@ import MyCourses from "../pages/Learner/MyCourses";
 import AskYourCourse from "../pages/Learner/AskYourCourse";
 import CourseViewer from "../pages/Learner/CourseViewer";
 import QuizAttempt from "../pages/Learner/QuizAttempt";
+import ModuleManagement from "../pages/Admin/ModuleManagement";
 
 export default function AppRouter() {
   return (
@@ -25,6 +26,7 @@ export default function AppRouter() {
 
         {/* ADMIN ROUTES */}
         <Route path="/admin/courses" element={<CourseManagement />} />
+       <Route path="/admin/module" element={<ModuleManagement />} />
         <Route path="/admin/quizzes" element={<QuizManagement />} />
         <Route path="/admin/progress" element={<UserProgress />} />
 

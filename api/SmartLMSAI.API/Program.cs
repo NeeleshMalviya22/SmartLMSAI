@@ -11,7 +11,7 @@ builder.Services.AddCorsPolicy();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddIdentityConfiguration();
 builder.Services.AddApplicationServices();
-//builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 
 var app = builder.Build();
