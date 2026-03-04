@@ -13,4 +13,6 @@ public class ApplicationDbContext
     {
     }
     public DbSet<Course> Courses { get; set; }
+    public DbSet<Module> Modules { get; set; }
+    public DbSet<Quiz> Quizzes { get; set; }
 }

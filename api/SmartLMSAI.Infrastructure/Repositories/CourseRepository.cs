@@ -12,7 +12,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
 
     public async Task<PagedResult<Course>> GetCoursesAsync(PagedRequest request)
     {
-        var query = _context.Courses.AsNoTracking().AsQueryable();
+        var query = _context.Courses.Where(x => x.IsDeleted != true).AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {

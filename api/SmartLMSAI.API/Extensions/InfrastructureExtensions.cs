@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartLMSAI.Application.Interfaces;
+using SmartLMSAI.Application.Interfaces.IRepositories;
 using SmartLMSAI.Application.Interfaces.Repositories;
 using SmartLMSAI.Infrastructure;
 using SmartLMSAI.Infrastructure.Repositories;
@@ -17,7 +18,9 @@ namespace SmartLMSAI.API.Extensions
                     configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<IUserRepository, UserRepository>()
-                     .AddScoped<ICourseRepository, CourseRepository>();
+                     .AddScoped<ICourseRepository, CourseRepository>()
+                     .AddScoped<IModuleRepository, ModuleRepository>()
+                     .AddScoped<IQuizRepository, QuizRepository>();
 
             return services;
         }

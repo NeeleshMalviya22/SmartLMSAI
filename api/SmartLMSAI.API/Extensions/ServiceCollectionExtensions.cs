@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SmartLMSAI.Application.Interfaces;
+using SmartLMSAI.Application.Interfaces.IServices;
 using SmartLMSAI.Application.Interfaces.Services;
 using SmartLMSAI.Application.Service;
 using SmartLMSAI.Infrastructure.Service;
@@ -11,7 +12,9 @@ namespace SmartLMSAI.API.Extensions
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             services.AddScoped<IAuthService, AuthService>()
-                    .AddScoped<ICourseService, CourseService>();
+                    .AddScoped<ICourseService, CourseService>()
+                    .AddScoped<IModuleService, ModuleService>()
+                    .AddScoped<IQuizService, QuizService>();
             return services;
         }
     }

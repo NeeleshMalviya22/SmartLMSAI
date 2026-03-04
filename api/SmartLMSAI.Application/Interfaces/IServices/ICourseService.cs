@@ -7,9 +7,9 @@ namespace SmartLMSAI.Application.Interfaces;
 public interface ICourseService
 {
     Task<ApiResponse<List<CourseDto>>> GetAllAsync();
-    Task<ApiResponse<Guid>> CreateAsync(CreateCourseDto dto, string userId);
+    Task<ApiResponse<Guid>> CreateAsync(CreateCourseDto dto, Guid userId);
     Task<ApiResponse<bool>> DeleteAsync(Guid id);
-    Task<ApiResponse<bool>> UpdateAsync(Guid id, CreateCourseDto dto, string userId);
+    Task<ApiResponse<bool>> UpdateAsync(Guid id, CreateCourseDto dto, Guid? userId);
     Task<PagedResult<Course>> GetCoursesAsync(PagedRequest request);
 
 }

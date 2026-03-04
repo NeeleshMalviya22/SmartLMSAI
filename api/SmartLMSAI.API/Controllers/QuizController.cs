@@ -1,55 +1,48 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
-using SmartLMSAI.Application.DTOs.Courses;
+using SmartLMSAI.Application.DTOs.Quizzes;
 using SmartLMSAI.Application.Interfaces;
+using SmartLMSAI.Application.Interfaces.IServices;
 using System.Security.Claims;
 
 namespace SmartLMSAI.API.Controllers;
 
 [ApiController]
-[Route("api/courses")]
+[Route("api/quizzes")]
 [Authorize]
-public class CourseController : ControllerBase
+public class QuizController : ControllerBase
 {
-    private readonly ICourseService _service;
+    private readonly IQuizService _service;
 
-    public CourseController(ICourseService service)
+    public QuizController(IQuizService service)
     {
         _service = service;
     }
 
-    [HttpGet("all")]
-    public async Task<IActionResult> GetAll()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
-
     [HttpGet]
-    public async Task<IActionResult> GetCourses([FromQuery] PagedRequest request)
+    public async Task<IActionResult> Get([FromQuery] PagedRequest request)
     {
-        return Ok(await _service.GetCoursesAsync(request));
+        return Ok(await _service.GetQuizzesAsync(request));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateCourseDto dto)
+    public async Task<IActionResult> Create(CreateQuizDto dto)
     {
         var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (!Guid.TryParse(userIdValue, out var userId)) {
+        if (!Guid.TryParse(userIdValue, out var userId))
             return Unauthorized();
-        }
 
         return Ok(await _service.CreateAsync(dto, userId));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, CreateCourseDto dto)
+    public async Task<IActionResult> Update(Guid id, CreateQuizDto dto)
     {
         var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdValue, out var userId)) {
+
+        if (!Guid.TryParse(userIdValue, out var userId))
             return Unauthorized();
-        }
 
         return Ok(await _service.UpdateAsync(id, dto, userId));
     }

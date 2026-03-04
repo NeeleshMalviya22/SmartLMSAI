@@ -17,4 +17,8 @@
 		<ProjectReference Include="..\SmartLMSAI.Application\SmartLMSAI.Application.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Migrations\" />
+	</ItemGroup>
+
 </Project>

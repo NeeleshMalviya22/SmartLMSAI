@@ -34,7 +34,7 @@ public class CourseService : ICourseService
         return await _repo.GetCoursesAsync(request);
     }
 
-    public async Task<ApiResponse<Guid>> CreateAsync(CreateCourseDto dto, string userId)
+    public async Task<ApiResponse<Guid>> CreateAsync(CreateCourseDto dto, Guid userId)
     {
         var course = new Course
         {
@@ -52,7 +52,7 @@ public class CourseService : ICourseService
         return ApiResponse<Guid>.Ok(course.Id);
     }
 
-    public async Task<ApiResponse<bool>> UpdateAsync(Guid id, CreateCourseDto dto, string userId)
+    public async Task<ApiResponse<bool>> UpdateAsync(Guid id, CreateCourseDto dto, Guid? userId)
     {
         var course = await _repo.GetByIdAsync(id);
 

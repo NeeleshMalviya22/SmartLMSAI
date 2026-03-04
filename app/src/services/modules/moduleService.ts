@@ -1,9 +1,21 @@
 import apiClient from "../apiClient";
 
-export const getModulesApi = async (courseId: string) => {
-  const res = await apiClient.get(`modules/course/${courseId}`);
+export const getModulesApi = async (params?: any) => {
+  const cleanedParams = Object.fromEntries(
+    Object.entries(params || {}).filter(
+      ([_, v]) => v !== undefined && v !== null && v !== ""
+    )
+  );
+
+  const res = await apiClient.get("modules", { params: cleanedParams });
   return res.data;
 };
+
+export const getAllModuleApi = async () => {
+  const res = await apiClient.get("modules/all");
+  return res.data;
+};
+
 
 export const createModuleApi = async (data: any) => {
   const res = await apiClient.post("modules", data);
