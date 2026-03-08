@@ -1,4 +1,4 @@
-import { Form, Input, Switch, Button, Space } from "antd";
+import { Form, Input, Switch} from "antd";
 import FormModal from "../common/FormModal";
 
 interface Props {
@@ -45,12 +45,12 @@ export default function CreateCourseModal({
         <Switch />
       </Form.Item>
 
-      <Space style={{ width: "100%", justifyContent: "flex-end" }}>
+      {/* <Space style={{ width: "100%", justifyContent: "flex-end" }}>
         <Button onClick={onClose}>Cancel</Button>
         <Button type="primary" htmlType="submit">
           {isEdit ? "Update Course" : "Create Course"}
         </Button>
-      </Space>
+      </Space> */}
     </FormModal>
   );
 }

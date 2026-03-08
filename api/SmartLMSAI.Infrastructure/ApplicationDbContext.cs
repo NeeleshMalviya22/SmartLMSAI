@@ -15,4 +15,7 @@ public class ApplicationDbContext
     public DbSet<Course> Courses { get; set; }
     public DbSet<Module> Modules { get; set; }
     public DbSet<Quiz> Quizzes { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<QuestionOption> QuestionOptions { get; set; }
+    public DbSet<QuestionType> QuestionTypes { get; set; }
 }

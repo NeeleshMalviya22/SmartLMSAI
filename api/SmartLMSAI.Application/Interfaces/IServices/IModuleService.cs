@@ -19,8 +19,6 @@ namespace SmartLMSAI.Application.Interfaces.IServices
         /// <summary>
         /// Get all modules for a specific course (ordered)
         /// </summary>
-        Task<ApiResponse<List<ModuleDto>>> GetByCourseAsync(Guid courseId);
-
         /// <summary>
         /// Create a new module
         /// </summary>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SmartLMSAI.Application.DTOs.Courses;
 using SmartLMSAI.Application.Interfaces;
 using SmartLMSAI.Domain.Entities;
 using SmartLMSAI.Infrastructure;
@@ -10,9 +11,9 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
     {
     }
 
-    public async Task<PagedResult<Course>> GetCoursesAsync(PagedRequest request)
+    public async Task<PagedResult<CourseDetailsDto>> GetCoursesAsync(PagedRequest request)
     {
-        var query = _context.Courses.Where(x => x.IsDeleted != true).AsNoTracking().AsQueryable();
+        var query = _context.Courses.Include(x => x.Modules).Where(x => x.IsDeleted != true).AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
@@ -51,8 +52,19 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
         var items = await query
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
+            .Select(c => new CourseDetailsDto
+            {
+                Id = c.Id,
+                Title = c.Title,
+                Description = c.Description,
+                IsActive = c.IsActive,
+                CreatedOn = c.CreatedOn,
+                ModuleCount = c.Modules.Count(m => !m.IsDeleted),
+                LearnerCount = 0
+            })
+            .AsNoTracking()
             .ToListAsync();
 
-        return new PagedResult<Course>(items, totalCount);
+        return new PagedResult<CourseDetailsDto>(items, totalCount);
     }
 }

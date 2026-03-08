@@ -14,7 +14,8 @@ namespace SmartLMSAI.API.Extensions
             services.AddScoped<IAuthService, AuthService>()
                     .AddScoped<ICourseService, CourseService>()
                     .AddScoped<IModuleService, ModuleService>()
-                    .AddScoped<IQuizService, QuizService>();
+                    .AddScoped<IQuizService, QuizService>()
+                    .AddScoped<IQuestionService, QuestionService>();
             return services;
         }
     }

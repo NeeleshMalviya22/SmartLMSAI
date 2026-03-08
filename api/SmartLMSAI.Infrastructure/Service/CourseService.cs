@@ -29,7 +29,7 @@ public class CourseService : ICourseService
         return ApiResponse<List<CourseDto>>.Ok(result);
     }
 
-    public async Task<PagedResult<Course>> GetCoursesAsync(PagedRequest request)
+    public async Task<PagedResult<CourseDetailsDto>> GetCoursesAsync(PagedRequest request)
     {
         return await _repo.GetCoursesAsync(request);
     }

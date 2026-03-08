@@ -1,31 +1,9 @@
-import apiClient from "../apiClient";
+import { createCrudService } from "../baseCrudService";
 
-export const getModulesApi = async (params?: any) => {
-  const cleanedParams = Object.fromEntries(
-    Object.entries(params || {}).filter(
-      ([_, v]) => v !== undefined && v !== null && v !== ""
-    )
-  );
+const moduleService = createCrudService("modules");
 
-  const res = await apiClient.get("modules", { params: cleanedParams });
-  return res.data;
-};
-
-export const getAllModuleApi = async () => {
-  const res = await apiClient.get("modules/all");
-  return res.data;
-};
-
-
-export const createModuleApi = async (data: any) => {
-  const res = await apiClient.post("modules", data);
-  return res.data;
-};
-
-export const updateModuleApi = async (id: string, data: any) => {
-  await apiClient.put(`modules/${id}`, data);
-};
-
-export const deleteModuleApi = async (id: string) => {
-  await apiClient.delete(`modules/${id}`);
-};
+export const getModulesApi = moduleService.getList;
+export const getAllModuleApi = moduleService.getAll;
+export const createModuleApi = moduleService.create;
+export const updateModuleApi = moduleService.update;
+export const deleteModuleApi = moduleService.delete;

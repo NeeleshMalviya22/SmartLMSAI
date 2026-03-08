@@ -92,11 +92,6 @@ namespace SmartLMSAI.Infrastructure.Service
             return ApiResponse<bool>.Ok(true);
         }
 
-        public Task<ApiResponse<List<ModuleDto>>> GetByCourseAsync(Guid courseId)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<ApiResponse<List<CourseDto>>> GetAllAsync()
         {
             var module = await _repo.GetAllAsync();

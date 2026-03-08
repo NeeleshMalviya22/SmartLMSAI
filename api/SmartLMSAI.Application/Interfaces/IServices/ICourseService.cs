@@ -10,6 +10,6 @@ public interface ICourseService
     Task<ApiResponse<Guid>> CreateAsync(CreateCourseDto dto, Guid userId);
     Task<ApiResponse<bool>> DeleteAsync(Guid id);
     Task<ApiResponse<bool>> UpdateAsync(Guid id, CreateCourseDto dto, Guid? userId);
-    Task<PagedResult<Course>> GetCoursesAsync(PagedRequest request);
+    Task<PagedResult<CourseDetailsDto>> GetCoursesAsync(PagedRequest request);
 
 }

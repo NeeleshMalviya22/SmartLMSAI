@@ -7,6 +7,8 @@ import {
   ClipboardList,
   Settings,
   LogOut,
+  Layers,
+  HelpCircle,
 } from "lucide-react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -77,8 +79,8 @@ export default function MainLayout() {
         <p className="text-xs text-gray-400 mb-2 tracking-wider">OVERVIEW</p>
         <div className="space-y-2 mb-6">
           <NavItem icon={LayoutDashboard} label="Dashboard" path="/" />
-           <NavItem icon={BookOpen} label="Module" path="/admin/module" badge="12" />
           <NavItem icon={BookOpen} label="Courses" path="/admin/courses" badge="12" />
+          <NavItem icon={Layers} label="Module" path="/admin/module" badge="12" />
           <NavItem icon={Users} label="Learners" path="/admin/learners" badge="148" />
         </div>
 

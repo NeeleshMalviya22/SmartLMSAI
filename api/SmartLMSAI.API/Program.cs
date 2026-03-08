@@ -25,6 +25,8 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     await RoleSeeder.SeedAsync(scope.ServiceProvider);
+    await QuestionTypeSeeder.SeedAsync(scope.ServiceProvider);
+
 }
 
 app.UseCorsPolicy();        // ✅ FIRST

@@ -1,4 +1,5 @@
-﻿using SmartLMSAI.Domain.Entities;
+﻿using SmartLMSAI.Application.DTOs.Courses;
+using SmartLMSAI.Domain.Entities;
 
 public interface ICourseRepository
 {
@@ -8,5 +9,5 @@ public interface ICourseRepository
     void Update(Course course);
     void Delete(Course course);
     Task SaveChangesAsync();
-    Task<PagedResult<Course>> GetCoursesAsync(PagedRequest request);
+    Task<PagedResult<CourseDetailsDto>> GetCoursesAsync(PagedRequest request);
 }
