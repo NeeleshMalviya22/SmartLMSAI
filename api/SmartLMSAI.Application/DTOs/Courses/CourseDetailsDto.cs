@@ -8,8 +8,9 @@ namespace SmartLMSAI.Application.DTOs.Courses
 {
     public class CourseDetailsDto : CourseDto
     {
-        public DateTime CreatedOn { get; set; }
+        public string? CreatedOn { get; set; }
         public int ModuleCount { get; set; }
         public int LearnerCount { get; set; }
+        public string? ModuleNames { get; set; }
     }
 }

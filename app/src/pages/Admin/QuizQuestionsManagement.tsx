@@ -1,3 +1,4 @@
+import { Tag } from "antd";
 import EntityManagement from "../../components/common/EntityManagement";
 import CreateQuestionModal from "../../components/modals/CreateQuestionModal";
 import {
@@ -21,8 +22,31 @@ const columns = [
 ];
 
 export default function QuizQuestionsManagement() {
-
   const { quizId } = useParams();
+
+  const renderOptions = (record: any) => {
+    return (
+      <div style={{ paddingLeft: 20 }}>
+        {record.options?.map((opt: any) => (
+          <div
+            key={opt.optionId}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              marginBottom: 6
+            }}
+          >
+            <Tag color={opt.isCorrect ? "green" : "default"}>
+              {opt.isCorrect ? "Correct" : "Option"}
+            </Tag>
+
+            <span>{opt.optionText}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <EntityManagement
@@ -39,6 +63,9 @@ export default function QuizQuestionsManagement() {
       ModalComponent={CreateQuestionModal}
       rowKey="questionId"
       modalProps={{ quizId }}
+      expandable={{
+        expandedRowRender: renderOptions
+      }}
     />
   );
 }

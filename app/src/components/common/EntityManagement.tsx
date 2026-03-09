@@ -20,6 +20,7 @@ export default function EntityManagement({
   ModalComponent,
   rowKey = "id",
   modalProps = {},
+  expandable
 }: any) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -158,6 +159,7 @@ export default function EntityManagement({
             showSizeChanger: true,
           }}
           onChange={handleTableChange}
+          expandable={expandable}
         />
       </Card>
 

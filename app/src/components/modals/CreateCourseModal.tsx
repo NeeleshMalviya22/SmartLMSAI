@@ -1,4 +1,5 @@
-import { Form, Input, Switch} from "antd";
+import { Form, Input, Switch, Tooltip } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import FormModal from "../common/FormModal";
 
 interface Props {
@@ -18,39 +19,78 @@ export default function CreateCourseModal({
 }: Props) {
   return (
     <FormModal
-      title={isEdit ? "Edit Course" : "Create New Course"}
+      title={isEdit ? "Edit Course" : "Create Course"}
       open={open}
       onClose={onClose}
       onSubmit={onSubmit}
       initialValues={initialValues}
     >
-      <Form.Item
-        label="Course Title"
-        name="title"
-        rules={[{ required: true, message: "Please enter course title" }]}
-      >
-        <Input size="large" />
-      </Form.Item>
+      <div className="space-y-6">
 
-      <Form.Item label="Description" name="description">
-        <Input.TextArea rows={4} />
-      </Form.Item>
+        {/* Course Title */}
+        <Form.Item
+          label={
+            <span className="text-sm font-medium">
+              Course Title{" "}
+              <Tooltip title="This title will be visible to learners">
+                <InfoCircleOutlined className="text-gray-400 ml-1" />
+              </Tooltip>
+            </span>
+          }
+          name="title"
+          rules={[{ required: true, message: "Please enter course title" }]}
+        >
+          <Input
+            size="large"
+            placeholder="Example: Introduction to React"
+            className="h-12 rounded-md border-gray-300"
+          />
+        </Form.Item>
 
-      <Form.Item
-        label="Active Status"
-        name="isActive"
-        valuePropName="checked"
-        initialValue={true}
-      >
-        <Switch />
-      </Form.Item>
+        {/* Description */}
+        <Form.Item
+          label={
+            <span className="text-sm font-medium">
+              Description{" "}
+              <Tooltip title="Optional short description about the course">
+                <InfoCircleOutlined className="text-gray-400 ml-1" />
+              </Tooltip>
+            </span>
+          }
+          name="description"
+        >
+          <Input.TextArea
+            rows={5}
+            placeholder="Write a short description..."
+            showCount
+            maxLength={500}
+            className="rounded-md border-gray-300 text-base"
+          />
+        </Form.Item>
 
-      {/* <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button type="primary" htmlType="submit">
-          {isEdit ? "Update Course" : "Create Course"}
-        </Button>
-      </Space> */}
+        {/* Active Status */}
+        <Form.Item
+          label={
+            <span className="text-sm font-medium">
+              Active Status{" "}
+              <Tooltip title="Enable or disable this course for learners">
+                <InfoCircleOutlined className="text-gray-400 ml-1" />
+              </Tooltip>
+            </span>
+          }
+          name="isActive"
+          valuePropName="checked"
+          initialValue={true}
+        >
+          <div className="flex items-center gap-4 mt-2">
+            <Switch />
+            <span className="text-gray-500 text-sm">
+              Course visible to learners
+            </span>
+          </div>
+        </Form.Item>
+
+      </div>
     </FormModal>
   );
 }

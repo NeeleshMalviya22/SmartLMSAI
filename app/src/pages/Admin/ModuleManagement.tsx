@@ -12,24 +12,11 @@ import { getAllCoursesApi } from "../../services/course/courseService";
 import { useEffect, useState } from "react";
 
 const columns = [
-  {
-    title: "Order",
-    dataIndex: "orderIndex",
-    sorter: true,
-  },
-  {
-    title: "Title",
-    dataIndex: "title",
-    sorter: true,
-  },
-  {
-    title: "Course",
-    dataIndex: "courseName",
-  },
-  {
-    title: "Description",
-    dataIndex: "description",
-  },
+  { title: "Title", dataIndex: "title", sorter: true},
+  {title: "Course", dataIndex: "courseName", sorter: true},
+  {title: "Description",  dataIndex: "description" },
+  {title: "Created on",  dataIndex: "createdOn" },
+
 ];
 
 export default function ModuleManagement() {

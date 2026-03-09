@@ -29,5 +29,7 @@ export const createCrudService = (endpoint: string) => ({
     const res = await apiClient.delete(`${endpoint}/${id}`);
     return res.data;
   },
+
+  
 });
 

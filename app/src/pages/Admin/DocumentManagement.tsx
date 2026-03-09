@@ -1,123 +1,62 @@
-import { useState } from "react";
-import { Table, Card, Typography, Tag } from "antd";
-import AppSearch from "../../components/common/AppSearch";
+import EntityManagement from "../../components/common/EntityManagement";
+import CreateDocumentModal from "../../components/modals/CreateDocumentModal";
+import { deleteDocumentApi, getDocumentsApi, uploadDocumentApi } from "../../services/document/documentService";
 
-const { Title } = Typography;
 
-interface DocumentItem {
-  id: string;
-  name: string;
-  type: string;
-  size: string;
-  uploadedBy: string;
-  status: boolean;
-}
+import { getAllModuleApi } from "../../services/modules/moduleService";
+import { useEffect, useState } from "react";
 
-const dummyDocuments: DocumentItem[] = [
+const columns = [
   {
-    id: "1",
-    name: "React Basics.pdf",
-    type: "PDF",
-    size: "2.4 MB",
-    uploadedBy: "Admin",
-    status: true,
+    title: "File",
+    dataIndex: "fileName"
   },
   {
-    id: "2",
-    name: "Angular Guide.docx",
-    type: "DOCX",
-    size: "1.8 MB",
-    uploadedBy: "Trainer",
-    status: true,
+    title: "Module",
+    dataIndex: "moduleName"
   },
   {
-    id: "3",
-    name: "NodeJS Notes.pdf",
-    type: "PDF",
-    size: "3.2 MB",
-    uploadedBy: "Admin",
-    status: false,
-  },
-  {
-    id: "4",
-    name: "System Design.pptx",
-    type: "PPTX",
-    size: "5.1 MB",
-    uploadedBy: "Trainer",
-    status: true,
-  },
+    title: "Uploaded",
+    dataIndex: "createdOn"
+  }
 ];
 
 export default function DocumentManagement() {
-  const [documents] = useState<DocumentItem[]>(dummyDocuments);
-  const [searchText, setSearchText] = useState("");
 
-  const filteredDocs = documents.filter((doc) =>
-    doc.name.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const [modules, setModules] = useState<any[]>([]);
 
-  const columns = [
-    {
-      title: "Document Name",
-      dataIndex: "name",
-      key: "name",
-      sorter: (a: DocumentItem, b: DocumentItem) =>
-        a.name.localeCompare(b.name),
-      render: (text: string) => <strong>{text}</strong>,
-    },
-    {
-      title: "Type",
-      dataIndex: "type",
-      key: "type",
-      sorter: (a: DocumentItem, b: DocumentItem) =>
-        a.type.localeCompare(b.type),
-    },
-    {
-      title: "Size",
-      dataIndex: "size",
-      key: "size",
-    },
-    {
-      title: "Uploaded By",
-      dataIndex: "uploadedBy",
-      key: "uploadedBy",
-    },
-    {
-      title: "Status",
-      key: "status",
-      render: (_: any, record: DocumentItem) =>
-        record.status ? (
-          <Tag color="green">Active</Tag>
-        ) : (
-          <Tag color="red">Inactive</Tag>
-        ),
-    },
-  ];
+  useEffect(() => {
+    loadModules();
+  }, []);
+
+  const loadModules = async () => {
+    const res = await getAllModuleApi();
+    setModules(res.data);
+  };
+
+  const uploadHandler = async (values: any) => {
+
+    const formData = new FormData();
+
+    formData.append("moduleId", values.moduleId);
+
+    const file = values.file.file;
+
+    formData.append("file", file);
+
+    await uploadDocumentApi(formData);
+  };
 
   return (
-    <div className="p-6">
-      <Title level={3} style={{ marginBottom: 12 }}>
-        Document Management
-      </Title>
-
-      <div className="flex justify-between items-center mb-4">
-        <AppSearch
-          placeholder="Search documents..."
-          onSearch={(val) => setSearchText(val)}
-        />
-      </div>
-
-      <Card>
-        <Table
-          rowKey="id"
-          columns={columns}
-          dataSource={filteredDocs}
-          pagination={{
-            pageSize: 5,
-            showSizeChanger: true,
-          }}
-        />
-      </Card>
-    </div>
+    <EntityManagement
+      title="Documents"
+      columns={columns}
+      fetchData={getDocumentsApi}
+      createApi={uploadHandler}
+      deleteApi={deleteDocumentApi}
+      ModalComponent={CreateDocumentModal}
+      rowKey="id"
+      modalProps={{ modules }}
+    />
   );
 }

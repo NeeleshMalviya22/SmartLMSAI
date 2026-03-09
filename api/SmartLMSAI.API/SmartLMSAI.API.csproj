@@ -19,4 +19,8 @@
 		<ProjectReference Include="..\SmartLMSAI.Infrastructure\SmartLMSAI.Infrastructure.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="uploads\documents\" />
+	</ItemGroup>
+
 </Project>

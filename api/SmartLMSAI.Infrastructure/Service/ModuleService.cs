@@ -33,7 +33,8 @@ namespace SmartLMSAI.Infrastructure.Service
                 Description = m.Description,
                 OrderIndex = m.OrderIndex,
                 IsActive = m.IsActive,
-                CourseName = m.Course.Title
+                CourseName = m.Course.Title,
+                CreatedOn = m.CreatedOn.ToString("dd MMM yyyy"),
             }).ToList();
 
             return new PagedResult<ModuleDto>(mapped, paged.TotalCount);
@@ -48,7 +49,8 @@ namespace SmartLMSAI.Infrastructure.Service
                 Title = dto.Title,
                 Description = dto.Description,
                 OrderIndex = dto.OrderIndex,
-                IsActive = dto.IsActive
+                IsActive = dto.IsActive,
+                CreatedOn = DateTime.Now
             };
 
             await _repo.AddAsync(module);

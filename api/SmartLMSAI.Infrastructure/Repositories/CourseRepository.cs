@@ -37,6 +37,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                         : query.OrderBy(c => c.IsActive);
                     break;
 
+
                 default:
                     query = query.OrderByDescending(c => c.Id);
                     break;
@@ -58,9 +59,12 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                 Title = c.Title,
                 Description = c.Description,
                 IsActive = c.IsActive,
-                CreatedOn = c.CreatedOn,
+                CreatedOn = c.CreatedOn.ToString("dd MMM yyyy"),
                 ModuleCount = c.Modules.Count(m => !m.IsDeleted),
-                LearnerCount = 0
+                LearnerCount = 0,
+                ModuleNames = string.Join(", ",c.Modules
+                                                .Where(m => !m.IsDeleted)
+                                                .Select(m => m.Title))
             })
             .AsNoTracking()
             .ToListAsync();
