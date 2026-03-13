@@ -23,7 +23,7 @@ namespace SmartLMSAI.API.Extensions
                      .AddScoped<IQuizRepository, QuizRepository>()
                      .AddScoped<IQuestionRepository, QuestionRepository>()
                      .AddScoped<IDocumentRepository, DocumentRepository>()
-                     ;
+                     .AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 
             return services;
         }

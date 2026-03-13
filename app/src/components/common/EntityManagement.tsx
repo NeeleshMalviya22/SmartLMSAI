@@ -7,6 +7,7 @@ import {
   handleAntTableChange,
 } from "../../utils/tableUtils";
 import DeleteButton from "./DeleteButton";
+import { SettingOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
 
@@ -20,7 +21,9 @@ export default function EntityManagement({
   ModalComponent,
   rowKey = "id",
   modalProps = {},
-  expandable
+  expandable,
+  hideCreateButton = false,
+  useSettingsAction = false
 }: any) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -71,13 +74,27 @@ export default function EntityManagement({
 
   const handleSubmit = async (values: any) => {
     try {
-      if (editingItem) {
+      if (useSettingsAction) {
+        console.log(editingItem);
+         console.log(values);
+        await updateApi({
+          learnerId: editingItem.learnerId,
+          ...values
+        });
+        message.success("Saved successfully.");
+      }
+      else if (editingItem) {
         await updateApi(editingItem[rowKey], values);
         message.success("Updated successfully.");
-      } else {
+      }
+      else {
         await createApi(values);
         message.success("Created successfully.");
       }
+
+    setOpenModal(false);
+    setEditingItem(null);
+    loadData();
 
       setOpenModal(false);
       setEditingItem(null);
@@ -97,11 +114,20 @@ export default function EntityManagement({
     }
   };
 
-  const enhancedColumns = [
-    ...columns,
-    {
-      title: "Actions",
-      render: (_: any, record: any) => (
+const enhancedColumns = [
+  ...columns,
+  {
+    title: useSettingsAction ? "Settings" : "Actions",
+    render: (_: any, record: any) => (
+      useSettingsAction ? (
+        <Button
+          icon={<SettingOutlined />}
+          onClick={() => {
+            setEditingItem(record);
+            setOpenModal(true);
+          }}
+        />
+      ) : (
         <Space>
           <Button
             type="link"
@@ -117,9 +143,10 @@ export default function EntityManagement({
             onConfirm={() => handleDelete(record[rowKey])}
           />
         </Space>
-      ),
-    },
-  ];
+      )
+    ),
+  },
+];
 
   return (
     <div className="p-6">
@@ -134,6 +161,7 @@ export default function EntityManagement({
           }}
         />
 
+      {!hideCreateButton && (
         <Button
           type="primary"
           size="large"
@@ -144,6 +172,7 @@ export default function EntityManagement({
         >
           + Create
         </Button>
+      )}
       </div>
 
       <Card>
