@@ -1,7 +1,8 @@
 import { createCrudService } from "../baseCrudService";
 import apiClient from "../apiClient";
+import type { DocumentItem } from "../../types/types";
 
-const documentService = createCrudService("documents");
+const documentService = createCrudService<DocumentItem>("documents");
 
 export const getDocumentsApi = documentService.getList;
 export const getAllDocumentsApi = documentService.getAll;

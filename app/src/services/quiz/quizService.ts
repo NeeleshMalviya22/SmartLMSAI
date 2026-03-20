@@ -1,6 +1,7 @@
 import { createCrudService } from "../baseCrudService";
+import type { Quiz } from "../../types/types";
 
-const quizService = createCrudService("quizzes");
+const quizService = createCrudService<Quiz>("quizzes");
 
 export const getQuizzesApi = quizService.getList;
 export const getAllQuizzesApi = quizService.getAll;

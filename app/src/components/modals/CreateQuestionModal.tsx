@@ -1,8 +1,24 @@
 import { Form, Input, Select, Space, Button, Checkbox } from "antd";
 import { useState } from "react";
 import FormModal from "../common/FormModal";
+import type { CreateQuestionModalProps } from "../../types/modals";
 
 const { Option } = Select;
+
+type QuestionType = "MCQ" | "TRUE_FALSE";
+
+interface CreateQuestionValues {
+  quizId: number;
+  questionText: string;
+  questionType: QuestionType;
+  orderIndex: number;
+  options?: Array<{ optionText: string; isCorrect: boolean; points?: number }>;
+  correctAnswer?: "true" | "false";
+}
+
+interface CreateQuestionPayload extends CreateQuestionValues {
+  questionTypeId: number;
+}
 
 export default function CreateQuestionModal({
   open,
@@ -11,24 +27,23 @@ export default function CreateQuestionModal({
   initialValues,
   isEdit,
   quizId,
-}: any) {
+}: CreateQuestionModalProps) {
 
-  const [type, setType] = useState("MCQ");
+  const [type, setType] = useState<QuestionType>("MCQ");
 
-  const handleSubmit = (values: any) => {
-
-    let payload: any = {
-      quizId: quizId, // ⭐ from URL
+  const handleSubmit = (values: CreateQuestionValues) => {
+    const payload: CreateQuestionPayload = {
+      quizId,
       questionText: values.questionText,
       orderIndex: values.orderIndex ?? 1,
+      questionType: values.questionType,
+      questionTypeId: values.questionType === "MCQ" ? 1 : 2,
+      options: [],
     };
 
     if (values.questionType === "MCQ") {
-
-      payload.questionTypeId = 1;
-
       payload.options =
-        values.options?.map((o: any) => ({
+        values.options?.map((o) => ({
           optionText: o.optionText,
           isCorrect: o.isCorrect || false,
           points: 1,
@@ -36,9 +51,6 @@ export default function CreateQuestionModal({
     }
 
     if (values.questionType === "TRUE_FALSE") {
-
-      payload.questionTypeId = 2;
-
       payload.options = [
         {
           optionText: "True",

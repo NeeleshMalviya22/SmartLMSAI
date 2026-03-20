@@ -61,7 +61,7 @@ export default function AdminDashboard() {
         {stats.map((item, i) => (
           <Col xs={24} sm={12} md={6} key={i}>
             <Card>
-              <Space direction="vertical">
+              <Space orientation="vertical">
                 <Text type="secondary">{item.title}</Text>
                 <Title level={3} style={{ margin: 0 }}>
                   {item.value}
@@ -125,7 +125,7 @@ export default function AdminDashboard() {
                   key={i}
                   type="circle"
                   percent={val}
-                  width={80}
+                  size={80}
                 />
               ))}
             </Space>

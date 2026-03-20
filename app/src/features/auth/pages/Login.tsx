@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginApi } from "../authService";
+import { loginApi, type LoginForm } from "../authService";
 import { saveAuth } from "../../../utils/authStorage";
 
-
+interface LoginState {
+  email: string;
+  password: string;
+}
 
 export default function Login() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<LoginState>({
     email: "",
     password: "",
   });
@@ -16,11 +19,11 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 
@@ -31,13 +34,19 @@ export default function Login() {
 
     try {
       setLoading(true);
-      const res = await loginApi(form);
+      const res = await loginApi(form as LoginForm);
+      const rawRole = res.data.data.role as string;
+      const normalizedRole =
+        rawRole?.toLowerCase() === "trainer" || rawRole?.toLowerCase() === "admin"
+          ? "admin"
+          : "learner";
+
       await saveAuth({
         token: res.data.data.token,
-        role: res.data.data.role,
-        userId: res.data.data.userId,
-        email: res.data.data.email
-    });
+        role: normalizedRole,
+        email: res.data.data.email,
+        name: res.data.data.name || ""
+      });
       navigate("/");
     } catch {
       setError("Invalid email or password");

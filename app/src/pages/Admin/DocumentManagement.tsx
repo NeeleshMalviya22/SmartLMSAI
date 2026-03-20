@@ -1,56 +1,50 @@
 import EntityManagement from "../../components/common/EntityManagement";
 import CreateDocumentModal from "../../components/modals/CreateDocumentModal";
-import { deleteDocumentApi, getDocumentsApi, uploadDocumentApi } from "../../services/document/documentService";
-
-
+import { documentColumns } from "../../config/tableColumns";
+import {
+  deleteDocumentApi,
+  getDocumentsApi,
+  uploadDocumentApi,
+} from "../../services/document/documentService";
 import { getAllModuleApi } from "../../services/modules/moduleService";
 import { useEffect, useState } from "react";
+import type { Module, DocumentItem } from "../../types/types";
 
-const columns = [
-  {
-    title: "File",
-    dataIndex: "fileName"
-  },
-  {
-    title: "Module",
-    dataIndex: "moduleName"
-  },
-  {
-    title: "Uploaded",
-    dataIndex: "createdOn"
-  }
-];
+interface UploadDocumentValues {
+  moduleId: number;
+  file: File;
+}
+
+interface ModalExtraProps {
+  modules: Module[];
+}
 
 export default function DocumentManagement() {
-
-  const [modules, setModules] = useState<any[]>([]);
+  const [modules, setModules] = useState<Module[]>([]);
 
   useEffect(() => {
-    loadModules();
+    void loadModules();
   }, []);
 
-  const loadModules = async () => {
+  async function loadModules() {
     const res = await getAllModuleApi();
-    setModules(res.data);
-  };
+    const moduleItems = Array.isArray(res)
+      ? res
+      : (res as { data?: Module[] })?.data ?? [];
+    setModules(moduleItems as Module[]);
+  }
 
-  const uploadHandler = async (values: any) => {
-
+  const uploadHandler = async (values: UploadDocumentValues) => {
     const formData = new FormData();
-
-    formData.append("moduleId", values.moduleId);
-
-    const file = values.file.file;
-
-    formData.append("file", file);
-
+    formData.append("moduleId", String(values.moduleId));
+    formData.append("file", values.file);
     await uploadDocumentApi(formData);
   };
 
   return (
-    <EntityManagement
+    <EntityManagement<DocumentItem, ModalExtraProps>
       title="Documents"
-      columns={columns}
+      columns={documentColumns}
       fetchData={getDocumentsApi}
       createApi={uploadHandler}
       deleteApi={deleteDocumentApi}

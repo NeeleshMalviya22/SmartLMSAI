@@ -1,61 +1,35 @@
 import EntityManagement from "../../components/common/EntityManagement";
 import CreateQuizModal from "../../components/modals/CreateQuizModal";
-
+import type { Module, Quiz } from "../../types/types";
+import { getQuizColumnsWithNavigation } from "../../config/tableColumns";
 import {
   getQuizzesApi,
   createQuizApi,
   updateQuizApi,
   deleteQuizApi,
 } from "../../services/quiz/quizService";
-
 import { getAllModuleApi } from "../../services/modules/moduleService";
 import { useEffect, useState } from "react";
-import { Button } from "antd";
 import { useNavigate } from "react-router-dom";
 
-
-
 export default function QuizManagement() {
-  const [modules, setModules] = useState([]);
+  const [modules, setModules] = useState<Module[]>([]);
   const navigate = useNavigate();
+
   useEffect(() => {
-    loadModules();
+    void loadModules();
   }, []);
 
-  const loadModules = async () => {
+  async function loadModules() {
     const res = await getAllModuleApi();
-    setModules(res.data);
-  };
-  const columns = [
-  {
-    title: "Quiz Title",
-    dataIndex: "title",
-    sorter: true,
-  },
-  {
-    title: "Module",
-    dataIndex: "moduleTitle",
-  },
-  {
-    title: "Passing Score",
-    dataIndex: "passingScore",
-    render: (val: number) => `${val}%`,
-  },
-   {
-    title: "Questions",
-    render: (_: any, record: any) => (
-      <Button
-        type="link"
-        onClick={() => navigate(`/admin/questions/${record.quizId}`)}
-      >
-        Manage Questions
-      </Button>
-    ),
-  },
-];
+    const moduleItems = Array.isArray(res) ? res : (res as { data?: Module[] })?.data ?? [];
+    setModules(moduleItems as Module[]);
+  }
+
+  const columns = getQuizColumnsWithNavigation(navigate);
 
   return (
-    <EntityManagement
+    <EntityManagement<Quiz, { modules?: Module[] }>
       title="Quiz Management"
       columns={columns}
       fetchData={getQuizzesApi}

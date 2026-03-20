@@ -1,5 +1,7 @@
 import { Form, Input, Select, InputNumber, Switch } from "antd";
 import FormModal from "../common/FormModal";
+import type { Module } from "../../types/types";
+import type { CreateQuizModalProps } from "../../types/modals";
 
 export default function CreateQuizModal({
   open,
@@ -8,7 +10,7 @@ export default function CreateQuizModal({
   initialValues,
   isEdit,
   modules,
-}: any) {
+}: CreateQuizModalProps) {
   return (
     <FormModal
       title={isEdit ? "Edit Quiz" : "Create Quiz"}
@@ -34,7 +36,7 @@ export default function CreateQuizModal({
           showSearch
           placeholder="Select Module"
           optionFilterProp="label"
-          options={modules?.map((m: any) => ({
+          options={modules?.map((m: Module) => ({
             label: m.title,
             value: m.id,
           }))}

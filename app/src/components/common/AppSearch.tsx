@@ -1,12 +1,8 @@
 import { Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
+import type { AppSearchProps } from "../../types/component-props";
 
-interface Props {
-  placeholder?: string;
-  onSearch: (value: string) => void;
-}
-
-export default function AppSearch({ placeholder, onSearch }: Props) {
+export default function AppSearch({ placeholder, onSearch }: AppSearchProps) {
   return (
     <Input
       allowClear

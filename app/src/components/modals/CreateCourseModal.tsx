@@ -1,14 +1,7 @@
 import { Form, Input, Switch, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import FormModal from "../common/FormModal";
-
-interface Props {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (values: any) => void;
-  initialValues?: any;
-  isEdit?: boolean;
-}
+import type { CreateCourseModalProps } from "../../types/modals";
 
 export default function CreateCourseModal({
   open,
@@ -16,7 +9,7 @@ export default function CreateCourseModal({
   onSubmit,
   initialValues,
   isEdit = false,
-}: Props) {
+}: CreateCourseModalProps) {
   return (
     <FormModal
       title={isEdit ? "Edit Course" : "Create Course"}

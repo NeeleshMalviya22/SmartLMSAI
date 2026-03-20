@@ -1,52 +1,41 @@
 import { useEffect, useState } from "react";
-
 import EntityManagement from "../../components/common/EntityManagement";
-import StatusTag from "../../components/common/StatusTag";
 import CreateLearnerModal from "../../components/modals/CreateLearnerModal";
-
-import { createLearnerApi, getLearnersApi } from "../../services/learner/learnerService";
+import { learnerColumns } from "../../config/tableColumns";
+import type { Course } from "../../types/types";
+import { getLearnersApi, updateLearnerApi } from "../../services/learner/learnerService";
 import { getAllCoursesApi } from "../../services/course/courseService";
 
-const columns = [
-  { title: "Name", dataIndex: "name", sorter: true },
-  { title: "Email", dataIndex: "email", sorter: true },
-  { title: "Courses", dataIndex: "courseTitle", sorter: true },
-  { title: "Created Date", dataIndex: "createdOn" },
-  {
-    title: "Status",
-    dataIndex: "isActive",
-    render: (val: boolean) => <StatusTag active={val} />
-  }
-];
-
 export default function LearnerManagement() {
-
-  const [courses, setCourses] = useState<any[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
 
   useEffect(() => {
-    loadModules();
+    void loadCourses();
   }, []);
 
-  const loadModules = async () => {
+  async function loadCourses() {
     try {
       const res = await getAllCoursesApi();
-      setCourses(res.data);
+      const courseItems = Array.isArray(res)
+        ? res
+        : (res as { data?: Course[] })?.data ?? [];
+      setCourses(courseItems as Course[]);
     } catch {
-      console.log("Failed to load modules");
+      console.log("Failed to load courses");
     }
-  };
+  }
 
   return (
-   <EntityManagement
+    <EntityManagement
       title="Learner Management"
-      columns={columns}
+      columns={learnerColumns}
       fetchData={getLearnersApi}
-      updateApi={createLearnerApi}
+      updateApi={updateLearnerApi}
       ModalComponent={CreateLearnerModal}
       rowKey="id"
       modalProps={{ courses }}
       hideCreateButton={true}
       useSettingsAction={true}
-/>
+    />
   );
 }

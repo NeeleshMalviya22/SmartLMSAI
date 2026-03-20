@@ -1,5 +1,15 @@
 import { Modal, Form, Input, InputNumber, Select, Upload, Button } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import type { Course } from "../../types/types";
+import type { CreateModuleModalProps } from "../../types/modals";
+
+interface CreateModuleValues {
+  courseId: number;
+  title: string;
+  description?: string;
+  order: number;
+  documents?: File[];
+}
 
 export default function CreateModuleModal({
   open,
@@ -7,10 +17,10 @@ export default function CreateModuleModal({
   onSubmit,
   initialValues,
   courses,
-}: any) {
+}: CreateModuleModalProps) {
   const [form] = Form.useForm();
 
-  const handleFinish = (values: any) => {
+  const handleFinish = (values: CreateModuleValues) => {
     onSubmit(values);
     form.resetFields();
   };
@@ -33,7 +43,7 @@ export default function CreateModuleModal({
           <Select
             showSearch
             placeholder="Select course"
-            options={courses.map((c: any) => ({
+            options={courses.map((c: Course) => ({
               value: c.id,
               label: c.title,
             }))}
@@ -64,7 +74,12 @@ export default function CreateModuleModal({
         </Form.Item>
 
         {/* 📄 Upload Documents */}
-        <Form.Item name="documents" label="Upload Documents">
+        <Form.Item
+          name="documents"
+          label="Upload Documents"
+          valuePropName="fileList"
+          getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
+        >
           <Upload multiple beforeUpload={() => false}>
             <Button icon={<UploadOutlined />}>Upload PDF</Button>
           </Upload>

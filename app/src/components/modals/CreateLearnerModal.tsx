@@ -1,14 +1,8 @@
 import { Form, Select, Switch, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import FormModal from "../common/FormModal";
-
-interface Props {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (values: any) => void;
-  initialValues?: any;
-  courses?: any[];
-}
+import type { CreateLearnerModalProps } from "../../types/modals";
+import type { Course } from "../../types/types";
 
 export default function CreateLearnerModal({
   open,
@@ -16,7 +10,7 @@ export default function CreateLearnerModal({
   onSubmit,
   initialValues,
   courses = []
-}: Props) {
+}: CreateLearnerModalProps) {
 
   return (
     <FormModal
@@ -38,7 +32,7 @@ export default function CreateLearnerModal({
           <Select
             showSearch
             placeholder="Select course"
-            options={courses.map((c: any) => ({
+            options={courses.map((c: Course) => ({
               value: c.id,
               label: c.title,
             }))}

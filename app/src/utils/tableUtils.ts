@@ -1,4 +1,14 @@
-export const defaultTableParams = {
+import type React from "react";
+
+export interface TableParams {
+  page: number;
+  pageSize: number;
+  total: number;
+  sortBy: string;
+  sortOrder: "" | "asc" | "desc";
+}
+
+export const defaultTableParams: TableParams = {
   page: 1,
   pageSize: 10,
   total: 0,
@@ -6,19 +16,22 @@ export const defaultTableParams = {
   sortOrder: "",
 };
 
-export const handleAntTableChange = (
-  pagination: any,
-  sorter: any,
-  setTableParams: any
-) => {
-  const field = Array.isArray(sorter) ? sorter[0]?.field : sorter?.field;
-  const order = Array.isArray(sorter) ? sorter[0]?.order : sorter?.order;
+import type { SorterResult } from "antd/es/table/interface";
 
-  setTableParams((prev: any) => ({
+export const handleAntTableChange = <T extends unknown>(
+  pagination: { current?: number; pageSize?: number },
+  sorter: SorterResult<T> | SorterResult<T>[],
+  setTableParams: React.Dispatch<React.SetStateAction<TableParams>>
+) => {
+  const firstSorter = Array.isArray(sorter) ? sorter[0] : sorter;
+  const field = firstSorter?.field;
+  const order = firstSorter?.order;
+
+  setTableParams((prev) => ({
     ...prev,
-    page: pagination.current,
-    pageSize: pagination.pageSize,
-    sortBy: field || "",
+    page: pagination.current ?? prev.page,
+    pageSize: pagination.pageSize ?? prev.pageSize,
+    sortBy: typeof field === "string" ? field : field !== undefined ? String(field) : "",
     sortOrder:
       order === "ascend"
         ? "asc"

@@ -1,6 +1,7 @@
 import { createCrudService } from "../baseCrudService";
+import type { Module } from "../../types/types";
 
-const moduleService = createCrudService("modules");
+const moduleService = createCrudService<Module>("modules");
 
 export const getModulesApi = moduleService.getList;
 export const getAllModuleApi = moduleService.getAll;

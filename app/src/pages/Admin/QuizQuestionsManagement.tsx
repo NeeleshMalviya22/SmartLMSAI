@@ -1,29 +1,18 @@
 import { Tag } from "antd";
 import EntityManagement from "../../components/common/EntityManagement";
 import CreateQuestionModal from "../../components/modals/CreateQuestionModal";
+import { questionColumns } from "../../config/tableColumns";
 import {
   createQuestionApi,
   deleteQuestionApi,
   getQuestionsApi,
   updateQuestionApi
 } from "../../services/question/questionService";
-
 import { useParams } from "react-router-dom";
 
-const columns = [
-  {
-    title: "Question",
-    dataIndex: "questionText",
-  },
-  {
-    title: "Type",
-    dataIndex: "questionType",
-  },
-];
-
 export default function QuizQuestionsManagement() {
-  const { quizId } = useParams();
-
+  const { quizId } = useParams<{ quizId: string }>();
+  const quizIdNumber: number = Number(quizId);
   const renderOptions = (record: any) => {
     return (
       <div style={{ paddingLeft: 20 }}>
@@ -48,21 +37,25 @@ export default function QuizQuestionsManagement() {
     );
   };
 
+  if (!quizIdNumber) {
+    return <div>Quiz ID is missing.</div>;
+  }
+
   return (
     <EntityManagement
       title="Quiz Questions"
-      columns={columns}
+      columns={questionColumns}
       fetchData={(params: any) =>
-        getQuestionsApi({ ...params, quizId })
+        getQuestionsApi({ ...params, quizId: quizIdNumber })
       }
       createApi={(data: any) =>
-        createQuestionApi({ ...data, quizId })
+        createQuestionApi({ ...data, quizId: quizIdNumber })
       }
       updateApi={updateQuestionApi}
       deleteApi={deleteQuestionApi}
       ModalComponent={CreateQuestionModal}
       rowKey="questionId"
-      modalProps={{ quizId }}
+      modalProps={{ quizId: quizIdNumber }}
       expandable={{
         expandedRowRender: renderOptions
       }}

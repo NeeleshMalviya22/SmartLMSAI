@@ -1,48 +1,68 @@
 import { Routes, Route } from "react-router-dom";
-import Login from "../features/auth/pages/Login";
-import Register from "../features/auth/pages/Register";
+import { lazy, Suspense } from "react";
+import { ROUTE_PATHS, PROTECTED_ROUTES } from "./routes.config";
+import RoleRoute from "../guards/RoleRoute";
 import AuthLayout from "../layouts/AuthLayout";
 import MainLayout from "../layouts/MainLayout";
 import RoleBasedDashboard from "../utils/RoleBasedDashboard";
-import CourseManagement from "../pages/Admin/CourseManagement";
-import QuizManagement from "../pages/Admin/QuizManagement";
-import UserProgress from "../pages/Admin/UserProgress";
-import MyCourses from "../pages/Learner/MyCourses";
-import AskYourCourse from "../pages/Learner/AskYourCourse";
-import CourseViewer from "../pages/Learner/CourseViewer";
-import QuizAttempt from "../pages/Learner/QuizAttempt";
-import ModuleManagement from "../pages/Admin/ModuleManagement";
-import LearnersManagement from "../pages/Admin/LearnersManagement";
-import DocumentManagement from "../pages/Admin/DocumentManagement";
-import QuizQuestionsManagement from "../pages/Admin/QuizQuestionsManagement";
+
+// Lazy load auth pages
+const Login = lazy(() => import("../features/auth/pages/Login"));
+const Register = lazy(() => import("../features/auth/pages/Register"));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+    Loading...
+  </div>
+);
 
 export default function AppRouter() {
   return (
     <Routes>
+      {/* Public Auth Routes */}
       <Route element={<AuthLayout />}>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route
+          path={ROUTE_PATHS.PUBLIC.LOGIN}
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <Login />
+            </Suspense>
+          }
+        />
+        <Route
+          path={ROUTE_PATHS.PUBLIC.REGISTER}
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <Register />
+            </Suspense>
+          }
+        />
       </Route>
 
+      {/* Protected Routes with MainLayout */}
       <Route element={<MainLayout />}>
-        <Route path="/" element={ <RoleBasedDashboard />}/>
+        <Route path={ROUTE_PATHS.HOME} element={<RoleBasedDashboard />} />
 
-        {/* ADMIN ROUTES */}
-        <Route path="/admin/courses" element={<CourseManagement />} />
-        <Route path="/admin/module" element={<ModuleManagement />} />
-        <Route path="/admin/quizzes" element={<QuizManagement />} />
-        <Route path="/admin/progress" element={<UserProgress />} />
-        <Route path="/admin/learners" element={<LearnersManagement/>} />
-        <Route path="/admin/documents" element={<DocumentManagement/>} />
-        <Route path="/admin/questions/:quizId" element={<QuizQuestionsManagement />} />
-        {/* LEARNER ROUTES */}
-        <Route path="/learner/courses" element={<MyCourses />} />
-        <Route path="/learner/ask" element={<AskYourCourse />} />
-        <Route path="/learner/view/:id" element={<CourseViewer />} />
-        <Route path="/learner/quiz/:id" element={<QuizAttempt />} />
-
+        {/* Role-based route mapping */}
+        {PROTECTED_ROUTES.map((route) => (
+          <Route
+            key={route.path}
+            path={route.path}
+            element={
+              <RoleRoute
+                component={route.component}
+                requiredRole={route.role!}
+              />
+            }
+          />
+        ))}
       </Route>
-
     </Routes>
   );
 }
+
+// Export route helpers for use in navigation/breadcrumbs/menus
+export { ROUTE_PATHS } from "./routes.config";
+
+

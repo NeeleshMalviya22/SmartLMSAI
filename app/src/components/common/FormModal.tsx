@@ -1,17 +1,8 @@
 import { Modal, Form } from "antd";
-import { useEffect, type ReactNode } from "react";
+import { useEffect } from "react";
+import type { FormModalProps } from "../../types/form-modal";
 
-interface Props {
-  title: string;
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (values: any) => void;
-  initialValues?: any;
-  width?: number;
-  children: ReactNode;
-}
-
-export default function FormModal({
+export default function FormModal<T extends object>({
   title,
   open,
   onClose,
@@ -19,7 +10,7 @@ export default function FormModal({
   initialValues,
   width = 700,
   children,
-}: Props) {
+}: FormModalProps<T>) {
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -30,7 +21,7 @@ export default function FormModal({
     }
   }, [open, initialValues, form]);
 
-  const handleFinish = (values: any) => {
+  const handleFinish = (values: T) => {
     onSubmit(values);
     form.resetFields();
   };
@@ -43,8 +34,9 @@ export default function FormModal({
       onOk={() => form.submit()}
       width={width}
       centered
-      destroyOnClose
-      maskClosable={false}
+      destroyOnHidden={false}
+      forceRender
+      mask={{ closable: false }}
     >
       <Form layout="vertical" form={form} onFinish={handleFinish}>
         {children}

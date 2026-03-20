@@ -1,13 +1,15 @@
 import { Form, Select, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import FormModal from "../common/FormModal";
+import type { Module } from "../../types/types";
+import type { CreateDocumentModalProps } from "../../types/modals";
 
 export default function CreateDocumentModal({
   open,
   onClose,
   onSubmit,
-  modules
-}: any) {
+  modules,
+}: CreateDocumentModalProps) {
   return (
     <FormModal
       title="Upload Document"
@@ -22,7 +24,7 @@ export default function CreateDocumentModal({
       >
         <Select
           placeholder="Select Module"
-          options={modules?.map((m: any) => ({
+          options={modules?.map((m: Module) => ({
             label: m.title,
             value: m.id
           }))}

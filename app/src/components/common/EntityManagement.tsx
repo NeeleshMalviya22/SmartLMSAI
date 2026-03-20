@@ -1,17 +1,15 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Button, Card, Typography, Space, message } from "antd";
-import AppSearch from "./AppSearch";
-
-import {
-  defaultTableParams,
-  handleAntTableChange,
-} from "../../utils/tableUtils";
 import DeleteButton from "./DeleteButton";
+import AppSearch from "./AppSearch";
 import { SettingOutlined } from "@ant-design/icons";
+import { defaultTableParams, handleAntTableChange } from "../../utils/tableUtils";
+import type { TablePaginationConfig, SorterResult, ColumnsType, FilterValue, TableCurrentDataSource } from "antd/es/table/interface";
+import type { EntityManagementProps } from "../../types/entity-management";
 
 const { Title } = Typography;
 
-export default function EntityManagement({
+export default function EntityManagement<T extends object, E extends object>({
   title,
   columns,
   fetchData,
@@ -20,20 +18,20 @@ export default function EntityManagement({
   deleteApi,
   ModalComponent,
   rowKey = "id",
-  modalProps = {},
+  modalProps = {} as E,
   expandable,
   hideCreateButton = false,
-  useSettingsAction = false
-}: any) {
-  const [data, setData] = useState<any[]>([]);
+  useSettingsAction = false,
+}: EntityManagementProps<T, E>) {
+  const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
+  const [editingItem, setEditingItem] = useState<T | null>(null);
   const [searchText, setSearchText] = useState("");
 
   const [tableParams, setTableParams] = useState(defaultTableParams);
 
-  const loadData = async () => {
+  const loadData = React.useCallback(async () => {
     try {
       setLoading(true);
 
@@ -47,7 +45,7 @@ export default function EntityManagement({
 
       setData(res.items);
 
-      setTableParams((prev: any) => ({
+      setTableParams((prev) => ({
         ...prev,
         total: res.totalCount,
       }));
@@ -56,11 +54,8 @@ export default function EntityManagement({
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    loadData();
   }, [
+    fetchData,
     searchText,
     tableParams.page,
     tableParams.pageSize,
@@ -68,85 +63,88 @@ export default function EntityManagement({
     tableParams.sortOrder,
   ]);
 
-  const handleTableChange = (pagination: any, _: any, sorter: any) => {
+  useEffect(() => {
+    void loadData();
+  }, [loadData]);
+
+  const handleTableChange = (
+    pagination: TablePaginationConfig,
+    _filters: Record<string, FilterValue | null>,
+    sorter: SorterResult<T> | SorterResult<T>[],
+    _extra: TableCurrentDataSource<T>
+  ) => {
     handleAntTableChange(pagination, sorter, setTableParams);
   };
 
   const handleSubmit = async (values: any) => {
     try {
-      if (useSettingsAction) {
-        console.log(editingItem);
-         console.log(values);
-        await updateApi({
-          learnerId: editingItem.learnerId,
-          ...values
-        });
+      if (useSettingsAction && updateApi && editingItem) {
+        await updateApi(String((editingItem as any)[rowKey]), values);
         message.success("Saved successfully.");
-      }
-      else if (editingItem) {
-        await updateApi(editingItem[rowKey], values);
+      } else if (editingItem && updateApi) {
+        await updateApi(String((editingItem as any)[rowKey]), values);
         message.success("Updated successfully.");
-      }
-      else {
+      } else if (createApi) {
         await createApi(values);
         message.success("Created successfully.");
       }
 
-    setOpenModal(false);
-    setEditingItem(null);
-    loadData();
-
       setOpenModal(false);
       setEditingItem(null);
-      loadData();
-    } catch {
-      message.error("Save failed.");
+      void loadData();
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : "Save failed.";
+      message.error(errorMsg);
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string | number) => {
     try {
-      await deleteApi(id);
-      message.success("Deleted successfully.");
-      loadData();
-    } catch {
-      message.error("Delete failed.");
+      if (deleteApi) {
+        await deleteApi(String(id));
+        message.success("Deleted successfully.");
+        void loadData();
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : "Delete failed.";
+      message.error(errorMsg);
     }
   };
 
-const enhancedColumns = [
-  ...columns,
-  {
-    title: useSettingsAction ? "Settings" : "Actions",
-    render: (_: any, record: any) => (
-      useSettingsAction ? (
-        <Button
-          icon={<SettingOutlined />}
-          onClick={() => {
-            setEditingItem(record);
-            setOpenModal(true);
-          }}
-        />
-      ) : (
-        <Space>
+  const enhancedColumns: ColumnsType<T> = [
+    ...columns,
+    {
+      title: useSettingsAction ? "Settings" : "Actions",
+      render: (_: unknown, record: T) =>
+        useSettingsAction ? (
           <Button
-            type="link"
+            icon={<SettingOutlined />}
             onClick={() => {
               setEditingItem(record);
               setOpenModal(true);
             }}
-          >
-            Edit
-          </Button>
-
-          <DeleteButton
-            onConfirm={() => handleDelete(record[rowKey])}
           />
-        </Space>
-      )
-    ),
-  },
-];
+        ) : (
+          <Space>
+            <Button
+              type="link"
+              onClick={() => {
+                setEditingItem(record);
+                setOpenModal(true);
+              }}
+            >
+              Edit
+            </Button>
+
+            <DeleteButton
+              onConfirm={() =>
+                handleDelete(String((record as any)[rowKey]))
+              }
+            />
+          </Space>
+        ),
+    },
+  ];
 
   return (
     <div className="p-6">
@@ -157,22 +155,22 @@ const enhancedColumns = [
           placeholder={`Search ${title}`}
           onSearch={(val) => {
             setSearchText(val);
-            setTableParams((prev: any) => ({ ...prev, page: 1 }));
+            setTableParams((prev) => ({ ...prev, page: 1 }));
           }}
         />
 
-      {!hideCreateButton && (
-        <Button
-          type="primary"
-          size="large"
-          onClick={() => {
-            setEditingItem(null);
-            setOpenModal(true);
-          }}
-        >
-          + Create
-        </Button>
-      )}
+        {!hideCreateButton && (
+          <Button
+            type="primary"
+            size="large"
+            onClick={() => {
+              setEditingItem(null);
+              setOpenModal(true);
+            }}
+          >
+            + Create
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -199,7 +197,7 @@ const enhancedColumns = [
           setEditingItem(null);
         }}
         onSubmit={handleSubmit}
-        initialValues={editingItem}
+        initialValues={editingItem || undefined}
         isEdit={!!editingItem}
         {...modalProps}
       />
