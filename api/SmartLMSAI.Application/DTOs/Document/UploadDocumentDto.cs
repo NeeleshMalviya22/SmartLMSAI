@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SmartLMSAI.Application.DTOs.Document
 {
-      public class UploadDocumentDto
+    public class UploadDocumentDto
     {
         public Guid ModuleId { get; set; }
 

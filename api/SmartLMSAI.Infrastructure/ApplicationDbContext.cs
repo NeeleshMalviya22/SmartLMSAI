@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SmartLMSAI.Domain.Entities;
@@ -20,4 +20,6 @@ public class ApplicationDbContext
     public DbSet<QuestionType> QuestionTypes { get; set; }
     public DbSet<Document> Documents { get; set; }
     public DbSet<Enrollment> Enrollments { get; set; }
+    public DbSet<ModuleProgress> ModuleProgress { get; set; }
+    public DbSet<QuizAttempt> QuizAttempts { get; set; }
 }

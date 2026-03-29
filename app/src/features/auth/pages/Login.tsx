@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginApi, type LoginForm } from "../authService";
-import { saveAuth } from "../../../utils/authStorage";
+import { useAuth } from "../../../context/AuthContext";
 
 interface LoginState {
   email: string;
@@ -10,6 +10,7 @@ interface LoginState {
 
 export default function Login() {
   const navigate = useNavigate();
+  const { loginWithData } = useAuth();
 
   const [form, setForm] = useState<LoginState>({
     email: "",
@@ -35,19 +36,17 @@ export default function Login() {
     try {
       setLoading(true);
       const res = await loginApi(form as LoginForm);
-      const rawRole = res.data.data.role as string;
+      const data = res.data.data;
+      const rawRole = (data.role as string)?.toLowerCase();
       const normalizedRole =
-        rawRole?.toLowerCase() === "trainer" || rawRole?.toLowerCase() === "admin"
-          ? "admin"
-          : "learner";
+        rawRole === "trainer" || rawRole === "admin" ? "admin" : "learner";
 
-      await saveAuth({
-        token: res.data.data.token,
-        role: normalizedRole,
-        email: res.data.data.email,
-        name: res.data.data.name || ""
+      await loginWithData({
+        token: data.token,
+        role: normalizedRole as any,
+        email: data.email || form.email,
+        name: data.name || data.email || form.email,
       });
-      navigate("/");
     } catch {
       setError("Invalid email or password");
     } finally {

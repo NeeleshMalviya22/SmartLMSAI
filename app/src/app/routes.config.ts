@@ -10,11 +10,10 @@ const LearnersManagement = lazy(() => import("../pages/Admin/LearnersManagement"
 const DocumentManagement = lazy(() => import("../pages/Admin/DocumentManagement"));
 const UserProgress = lazy(() => import("../pages/Admin/UserProgress"));
 
-const MyCourses = lazy(() => import("../pages/Learner/MyCourses"));
 const AskYourCourse = lazy(() => import("../pages/Learner/AskYourCourse"));
 const CourseViewer = lazy(() => import("../pages/Learner/CourseViewer"));
 const QuizAttempt = lazy(() => import("../pages/Learner/QuizAttempt"));
-
+const LearnerCourses = lazy(() => import("../pages/Learner/MyCourses"));
 
 export const ROUTE_PATHS = {
   // Public routes
@@ -104,9 +103,9 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 export const LEARNER_ROUTES: RouteConfig[] = [
   {
     path: ROUTE_PATHS.LEARNER.COURSES,
-    component: MyCourses,
+    component: LearnerCourses,
     role: "learner",
-    label: "My Courses",
+    label: "Courses",
   },
   {
     path: ROUTE_PATHS.LEARNER.ASK,

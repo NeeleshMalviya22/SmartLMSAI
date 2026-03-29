@@ -15,6 +15,6 @@ namespace SmartLMSAI.Infrastructure.Repositories
         void Update(Module module);
         Task SaveChangesAsync();
         Task<List<Module>> GetAllAsync();
-
+        Task<List<Module>> GetModulesByCourseIdAsync(Guid courseId);
     }
 }

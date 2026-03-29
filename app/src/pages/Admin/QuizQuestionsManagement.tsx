@@ -12,7 +12,7 @@ import { useParams } from "react-router-dom";
 
 export default function QuizQuestionsManagement() {
   const { quizId } = useParams<{ quizId: string }>();
-  const quizIdNumber: number = Number(quizId);
+  const quizIdNumber = quizId;
   const renderOptions = (record: any) => {
     return (
       <div style={{ paddingLeft: 20 }}>

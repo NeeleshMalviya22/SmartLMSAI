@@ -12,7 +12,7 @@ import type { Module, DocumentItem } from "../../types/types";
 
 interface UploadDocumentValues {
   moduleId: number;
-  file: File;
+  file: any[];
 }
 
 interface ModalExtraProps {
@@ -37,7 +37,7 @@ export default function DocumentManagement() {
   const uploadHandler = async (values: UploadDocumentValues) => {
     const formData = new FormData();
     formData.append("moduleId", String(values.moduleId));
-    formData.append("file", values.file);
+    formData.append("file", values.file?.[0]?.originFileObj);
     await uploadDocumentApi(formData);
   };
 

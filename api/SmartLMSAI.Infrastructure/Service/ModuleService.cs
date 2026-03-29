@@ -108,5 +108,19 @@ namespace SmartLMSAI.Infrastructure.Service
 
             return ApiResponse<List<CourseDto>>.Ok(result);
         }
+
+        public async Task<List<ModuleDto>> GetModuleByCourseAsync(Guid courseId)
+        {
+            var modules = await _repo.GetModulesByCourseIdAsync(courseId);
+
+            return modules.Select(m => new ModuleDto
+            {
+                ModuleId = m.Id,
+                Title = m.Title,
+                Description = m.Description,
+                CourseId = m.CourseId
+            }).ToList();
+        }
+
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SmartLMSAI.Application.DTOs.Document;
 using SmartLMSAI.Application.Interfaces.IRepositories;
 using SmartLMSAI.Domain.Entities;
@@ -72,11 +72,20 @@ namespace SmartLMSAI.Infrastructure.Repositories
         public async Task<List<Document>> GetByModuleAsync(Guid moduleId)
         {
             return await _context.Documents.Include(m => m.Module)
-                .Where(x => !x.IsDeleted)
+                .Where(x => !x.IsDeleted && x.ModuleId == moduleId)
                 .AsNoTracking()
                 .ToListAsync();
         }
 
-       
+        public async Task<List<Document>> GetByCourseWithTextAsync(Guid courseId)
+        {
+            return await _context.Documents
+                .Include(d => d.Module)
+                .Where(d => !d.IsDeleted
+                    && d.Module.CourseId == courseId
+                    && d.ExtractedText != null)
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

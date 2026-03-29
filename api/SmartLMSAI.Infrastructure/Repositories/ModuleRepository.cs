@@ -58,6 +58,12 @@ namespace SmartLMSAI.Infrastructure.Repositories
 
             return new PagedResult<Module>(items, total);
         }
+        public async Task<List<Module>> GetModulesByCourseIdAsync(Guid courseId)
+        {
+            return await _context.Modules
+                .Where(m => m.CourseId == courseId)
+                .ToListAsync();
+        }
 
     }
 }

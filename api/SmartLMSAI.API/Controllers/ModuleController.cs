@@ -58,4 +58,11 @@ public class ModuleController : ControllerBase
     {
         return Ok(await _service.DeleteAsync(id));
     }
+
+    [HttpGet("{courseId}")]
+    public async Task<IActionResult> GetModuleByCourseAsync(Guid courseId)
+    {
+        var result = await _service.GetModuleByCourseAsync(courseId);
+        return Ok(result);
+    }
 }

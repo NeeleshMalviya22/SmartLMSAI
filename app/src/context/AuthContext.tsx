@@ -10,6 +10,7 @@ interface AuthContextValue {
   isTrainer: () => boolean;
   isLearner: () => boolean;
   loginMock: (role: Role) => Promise<void>;
+  loginWithData: (data: AuthData) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -61,6 +62,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     navigate("/");
   }, [navigate]);
 
+  const loginWithData = React.useCallback(async (data: AuthData) => {
+    const roleLower = data.role?.toLowerCase();
+    const mappedRole: Role =
+      roleLower === "learner" ? "learner" : "admin";
+
+    const authToSave: AuthData = { ...data, role: mappedRole };
+    await saveAuth(authToSave);
+    setUser({ id: data.id, name: data.name || "", role: mappedRole, email: data.email });
+    setRole(mappedRole);
+    navigate("/");
+  }, [navigate]);
+
   const logout = React.useCallback(async () => {
     await clearAuth();
     setUser(null);
@@ -72,8 +85,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isLearner = React.useCallback(() => role === "learner", [role]);
 
   const value = useMemo(
-    () => ({ user, role, loading, isTrainer, isLearner, loginMock, logout }),
-    [user, role, loading, isTrainer, isLearner, loginMock, logout],
+    () => ({ user, role, loading, isTrainer, isLearner, loginMock, loginWithData, logout }),
+    [user, role, loading, isTrainer, isLearner, loginMock, loginWithData, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

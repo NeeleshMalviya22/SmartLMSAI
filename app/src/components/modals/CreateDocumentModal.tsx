@@ -30,11 +30,14 @@ export default function CreateDocumentModal({
           }))}
         />
       </Form.Item>
-
       <Form.Item
         name="file"
         label="PDF File"
-        valuePropName="file"
+        valuePropName="fileList"
+        getValueFromEvent={(e) => {
+          if (Array.isArray(e)) return e;
+          return e?.fileList;
+        }}
         rules={[{ required: true }]}
       >
         <Upload
@@ -48,6 +51,7 @@ export default function CreateDocumentModal({
           </div>
         </Upload>
       </Form.Item>
+
     </FormModal>
   );
 }

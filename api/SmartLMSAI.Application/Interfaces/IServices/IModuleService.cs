@@ -36,5 +36,8 @@ namespace SmartLMSAI.Application.Interfaces.IServices
 
         Task<ApiResponse<List<CourseDto>>> GetAllAsync();
 
+        Task<List<ModuleDto>> GetModuleByCourseAsync(Guid courseId);
+
+
     }
 }

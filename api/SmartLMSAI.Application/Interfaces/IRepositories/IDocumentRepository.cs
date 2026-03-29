@@ -1,4 +1,4 @@
-﻿using SmartLMSAI.Application.DTOs.Document;
+using SmartLMSAI.Application.DTOs.Document;
 using SmartLMSAI.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,8 @@ namespace SmartLMSAI.Application.Interfaces.IRepositories
     public interface IDocumentRepository
     {
         Task<List<Document>> GetByModuleAsync(Guid moduleId);
+
+        Task<List<Document>> GetByCourseWithTextAsync(Guid courseId);
 
         Task AddAsync(Document document);
 

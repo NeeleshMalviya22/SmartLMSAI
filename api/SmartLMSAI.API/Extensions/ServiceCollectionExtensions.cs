@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using SmartLMSAI.Application.Interfaces;
 using SmartLMSAI.Application.Interfaces.IRepositories;
 using SmartLMSAI.Application.Interfaces.IServices;
@@ -20,7 +20,11 @@ namespace SmartLMSAI.API.Extensions
                     .AddScoped<IQuestionService, QuestionService>()
                     .AddScoped<IDocumentService, DocumentService>()
                     .AddScoped<ICloudinaryService, CloudinaryService>()
-                    .AddScoped<IEnrollmentService, EnrollmentService>();
+                    .AddScoped<IEnrollmentService, EnrollmentService>()
+                    .AddScoped<IPdfTextExtractor, PdfTextExtractorService>()
+                    .AddScoped<IAskCourseService, AskCourseService>()
+                    .AddScoped<ILearnerCourseService, LearnerCourseService>()
+                    .AddScoped<IAiService, AiService>();
             return services;
         }
     }

@@ -2,6 +2,7 @@ import { Form, Input, Switch, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import FormModal from "../common/FormModal";
 import type { CreateCourseModalProps } from "../../types/modals";
+import { useEffect } from "react";
 
 export default function CreateCourseModal({
   open,
@@ -10,6 +11,12 @@ export default function CreateCourseModal({
   initialValues,
   isEdit = false,
 }: CreateCourseModalProps) {
+  console.log("Render 👉", initialValues);
+
+  useEffect(() => {
+    console.log("Updated 👉", initialValues);
+  }, [initialValues]);
+  
   return (
     <FormModal
       title={isEdit ? "Edit Course" : "Create Course"}
@@ -73,7 +80,6 @@ export default function CreateCourseModal({
           }
           name="isActive"
           valuePropName="checked"
-          initialValue={true}
         >
           <div className="flex items-center gap-4 mt-2">
             <Switch />
