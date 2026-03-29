@@ -35,7 +35,7 @@ public class AiService : IAiService
         };
 
         var json = JsonSerializer.Serialize(requestBody);
-        var apikey = "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";
+        var apikey = "";
         _httpClient.DefaultRequestHeaders.Clear();
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apikey}");
 
