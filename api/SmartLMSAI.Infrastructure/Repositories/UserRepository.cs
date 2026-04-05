@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using SmartLMSAI.Application.Interfaces.Repositories;
+using Microsoft.AspNetCore.Identity;
+using SmartLMSAI.Application.Interfaces.IRepositories;
 
 namespace SmartLMSAI.Infrastructure.Repositories;
 
@@ -26,9 +26,7 @@ public class UserRepository : IUserRepository
 
         var result = await _userManager.CreateAsync(user, password);
         if (!result.Succeeded)
-        {
             throw new ApplicationException(string.Join(", ", result.Errors.Select(e => e.Description)));
-        }
 
         return user.Id;
     }
@@ -43,9 +41,7 @@ public class UserRepository : IUserRepository
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
-        {
             return null;
-        }
 
         var valid = await _userManager.CheckPasswordAsync(user, password);
         return valid ? user.Id : null;

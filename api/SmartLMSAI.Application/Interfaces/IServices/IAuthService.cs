@@ -1,7 +1,7 @@
-﻿using SmartLMSAI.Application.Common;
+using SmartLMSAI.Application.Common;
 using SmartLMSAI.Application.DTOs.Auth;
 
-namespace SmartLMSAI.Application.Interfaces.Services;
+namespace SmartLMSAI.Application.Interfaces.IServices;
 
 public interface IAuthService
 {

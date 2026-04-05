@@ -10,10 +10,11 @@ const LearnersManagement = lazy(() => import("../pages/Admin/LearnersManagement"
 const DocumentManagement = lazy(() => import("../pages/Admin/DocumentManagement"));
 const UserProgress = lazy(() => import("../pages/Admin/UserProgress"));
 
+const MyCourses = lazy(() => import("../pages/Learner/MyCourses"));
 const AskYourCourse = lazy(() => import("../pages/Learner/AskYourCourse"));
 const CourseViewer = lazy(() => import("../pages/Learner/CourseViewer"));
 const QuizAttempt = lazy(() => import("../pages/Learner/QuizAttempt"));
-const LearnerCourses = lazy(() => import("../pages/Learner/MyCourses"));
+
 
 export const ROUTE_PATHS = {
   // Public routes
@@ -39,7 +40,7 @@ export const ROUTE_PATHS = {
   // Learner routes
   LEARNER: {
     COURSES: "/learner/courses",
-    ASK: "/learner/ask",
+    ASK: (id: string | string) => `/learner/ask/${id}`,
     VIEW_COURSE: (courseId: string | number) => `/learner/view/${courseId}`,
     QUIZ_ATTEMPT: (quizId: string | number) => `/learner/quiz/${quizId}`,
   },
@@ -103,12 +104,12 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 export const LEARNER_ROUTES: RouteConfig[] = [
   {
     path: ROUTE_PATHS.LEARNER.COURSES,
-    component: LearnerCourses,
+    component: MyCourses,
     role: "learner",
-    label: "Courses",
+    label: "My Courses",
   },
   {
-    path: ROUTE_PATHS.LEARNER.ASK,
+    path: "/learner/ask/:id", 
     component: AskYourCourse,
     role: "learner",
     label: "Ask Your Course",

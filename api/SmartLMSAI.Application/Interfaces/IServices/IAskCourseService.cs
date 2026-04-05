@@ -1,7 +1,7 @@
-using SmartLMSAI.Application.DTOs.AskCourse;
 using SmartLMSAI.Application.Common;
+using SmartLMSAI.Application.DTOs.AskCourse;
 
-namespace SmartLMSAI.Application.Interfaces;
+namespace SmartLMSAI.Application.Interfaces.IServices;
 
 public interface IAskCourseService
 {

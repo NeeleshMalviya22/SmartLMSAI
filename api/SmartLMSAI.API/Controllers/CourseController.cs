@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartLMSAI.Application.Common;
 using SmartLMSAI.Application.DTOs.Courses;
-using SmartLMSAI.Application.Interfaces;
+using SmartLMSAI.Application.Interfaces.IServices;
 using System.Security.Claims;
 
 namespace SmartLMSAI.API.Controllers;
@@ -34,11 +34,8 @@ public class CourseController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateCourseDto dto)
     {
-        var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!Guid.TryParse(userIdValue, out var userId)) {
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
             return Unauthorized();
-        }
 
         return Ok(await _service.CreateAsync(dto, userId));
     }
@@ -46,10 +43,8 @@ public class CourseController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(Guid id, CreateCourseDto dto)
     {
-        var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdValue, out var userId)) {
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
             return Unauthorized();
-        }
 
         return Ok(await _service.UpdateAsync(id, dto, userId));
     }

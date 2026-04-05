@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import type { Module, DocumentItem } from "../../types/types";
 
 interface UploadDocumentValues {
-  moduleId: number;
+  moduleId: string;
   file: any[];
 }
 

@@ -135,6 +135,25 @@ export default function CourseViewer() {
                     {completingId === mod.moduleId ? "Saving..." : "Mark Complete"}
                   </button>
                 )}
+
+                <button
+                    onClick={() => navigate(`/learner/module/${mod.moduleId}`)}
+                     className="bg-blue-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-600 flex items-center gap-1 shadow"
+> 
+                    <BookOpen size={14} 
+                    />
+                    View
+                </button>
+
+                {/* ✅ NEW: Ask AI */}
+                <button
+                    onClick={() => navigate(`/learner/ask/${mod.moduleId}`)}
+                    className="bg-indigo-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-indigo-600 flex items-center gap-1 shadow"
+                  >
+                    <MessageSquare size={14} />
+                    Ask AI
+                </button>
+
                 {isCompleted && mod.hasQuiz && mod.quizId && (
                   <button
                     onClick={() => navigate(`/learner/quiz/${mod.quizId}`)}
@@ -162,15 +181,6 @@ export default function CourseViewer() {
             </div>
           </div>
         )}
-
-        <button
-          onClick={() => navigate(`/learner/ask`)}
-          className="bg-gray-800 text-white px-5 py-3 rounded-xl hover:bg-gray-900
-                     transition flex items-center gap-2"
-        >
-          <MessageSquare size={18} />
-          Ask Your Course AI
-        </button>
       </div>
     </div>
   );

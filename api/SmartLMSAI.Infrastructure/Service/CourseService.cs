@@ -1,6 +1,7 @@
-﻿using SmartLMSAI.Application.Common;
+using SmartLMSAI.Application.Common;
 using SmartLMSAI.Application.DTOs.Courses;
-using SmartLMSAI.Application.Interfaces;
+using SmartLMSAI.Application.Interfaces.IRepositories;
+using SmartLMSAI.Application.Interfaces.IServices;
 using SmartLMSAI.Domain.Entities;
 
 namespace SmartLMSAI.Infrastructure.Service;
@@ -18,13 +19,15 @@ public class CourseService : ICourseService
     {
         var courses = await _repo.GetAllAsync();
 
-        var result = courses.Select(c => new CourseDto
-        {
-            Id = c.Id,
-            Title = c.Title,
-            Description = c.Description,
-            IsActive = c.IsActive
-        }).ToList();
+        var result = courses
+            .Where(c => !c.IsDeleted)
+            .Select(c => new CourseDto
+            {
+                Id = c.Id,
+                Title = c.Title,
+                Description = c.Description,
+                IsActive = c.IsActive
+            }).ToList();
 
         return ApiResponse<List<CourseDto>>.Ok(result);
     }
@@ -62,7 +65,6 @@ public class CourseService : ICourseService
         course.Title = dto.Title;
         course.Description = dto.Description;
         course.IsActive = dto.IsActive;
-
         course.ModifiedOn = DateTime.UtcNow;
         course.ModifiedBy = userId;
 

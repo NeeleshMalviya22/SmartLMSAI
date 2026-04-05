@@ -1,29 +1,24 @@
-using SmartLMSAI.Application.DTOs.Document;
-using SmartLMSAI.Application.Interfaces;
-using SmartLMSAI.Application.Interfaces.IRepositories;
-using SmartLMSAI.Domain.Entities;
-using SmartLMSAI.Infrastructure.Repositories;
 using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
+using SmartLMSAI.Application.Common;
+using SmartLMSAI.Application.DTOs.Document;
+using SmartLMSAI.Application.Interfaces.IRepositories;
+using SmartLMSAI.Application.Interfaces.IServices;
+using SmartLMSAI.Domain.Entities;
 
 namespace SmartLMSAI.Infrastructure.Service;
 
 public class DocumentService : IDocumentService
 {
     private readonly IDocumentRepository _repo;
-    private readonly ICloudinaryService _cloudinaryService;
     private readonly IPdfTextExtractor _pdfTextExtractor;
     private readonly ILogger<DocumentService> _logger;
 
     public DocumentService(
         IDocumentRepository repo,
-        ICloudinaryService cloudinaryService,
         IPdfTextExtractor pdfTextExtractor,
         ILogger<DocumentService> logger)
     {
         _repo = repo;
-        _cloudinaryService = cloudinaryService;
         _pdfTextExtractor = pdfTextExtractor;
         _logger = logger;
     }
@@ -46,7 +41,7 @@ public class DocumentService : IDocumentService
         return new PagedResult<DocumentDto>(mapped, paged.TotalCount);
     }
 
-    public async Task<Guid> UploadAsync(UploadDocumentDto dto, Guid userId)
+    public async Task<ApiResponse<Guid>> UploadAsync(UploadDocumentDto dto, Guid userId)
     {
         var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads", "documents");
 
@@ -91,45 +86,21 @@ public class DocumentService : IDocumentService
         await _repo.AddAsync(document);
         await _repo.SaveChangesAsync();
 
-        return document.Id;
+        return ApiResponse<Guid>.Ok(document.Id);
     }
 
-    //public async Task<Guid> UploadAsync(UploadDocumentDto dto, Guid userId)
-    //{
-    //    // Upload to Cloudinary
-    //    var fileUrl = await _cloudinaryService.UploadFileAsync(dto.File);
-
-    //    var document = new Document
-    //    {
-    //        Id = Guid.NewGuid(),
-    //        ModuleId = dto.ModuleId,
-    //        FileName = dto.File.FileName,
-    //        FilePath = fileUrl,
-    //        FileSize = dto.File.Length,
-    //        ContentType = dto.File.ContentType,
-    //        CreatedOn = DateTime.UtcNow,
-    //        CreatedBy = userId
-    //    };
-
-    //    await _repo.AddAsync(document);
-    //    await _repo.SaveChangesAsync();
-
-    //    return document.Id;
-    //}
-
-
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<ApiResponse<bool>> DeleteAsync(Guid id)
     {
         var doc = await _repo.GetByIdAsync(id);
 
         if (doc == null)
-            return false;
+            return ApiResponse<bool>.Fail("Document not found");
 
         doc.IsDeleted = true;
         doc.ModifiedOn = DateTime.UtcNow;
 
         await _repo.SaveChangesAsync();
 
-        return true;
+        return ApiResponse<bool>.Ok(true);
     }
 }

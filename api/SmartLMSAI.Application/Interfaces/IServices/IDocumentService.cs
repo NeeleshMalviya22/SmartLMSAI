@@ -1,13 +1,11 @@
-﻿using SmartLMSAI.Application.DTOs.Document;
+using SmartLMSAI.Application.Common;
+using SmartLMSAI.Application.DTOs.Document;
 
-namespace SmartLMSAI.Application.Interfaces;
+namespace SmartLMSAI.Application.Interfaces.IServices;
 
 public interface IDocumentService
 {
-    Task<Guid> UploadAsync(UploadDocumentDto dto, Guid userId);
-
-
-    Task<bool> DeleteAsync(Guid id);
-
     Task<PagedResult<DocumentDto>> GetDocumentsAsync(PagedRequest request);
+    Task<ApiResponse<Guid>> UploadAsync(UploadDocumentDto dto, Guid userId);
+    Task<ApiResponse<bool>> DeleteAsync(Guid id);
 }

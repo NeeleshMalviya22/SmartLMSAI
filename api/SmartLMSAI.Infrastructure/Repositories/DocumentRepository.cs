@@ -1,91 +1,67 @@
 using Microsoft.EntityFrameworkCore;
-using SmartLMSAI.Application.DTOs.Document;
+using SmartLMSAI.Application.Common;
 using SmartLMSAI.Application.Interfaces.IRepositories;
 using SmartLMSAI.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SmartLMSAI.Infrastructure.Repositories
+namespace SmartLMSAI.Infrastructure.Repositories;
+
+public class DocumentRepository : BaseRepository<Document>, IDocumentRepository
 {
-    public class DocumentRepository : BaseRepository<Document>, IDocumentRepository
+    public DocumentRepository(ApplicationDbContext context) : base(context) { }
+
+    public async Task<PagedResult<Document>> GetPagedAsync(PagedRequest request)
     {
-        public DocumentRepository(ApplicationDbContext context) : base(context)
+        var query = _dbSet
+            .Where(x => !x.IsDeleted)
+            .Include(x => x.Module)
+            .AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
         {
+            var term = request.Search.Trim();
+            query = query.Where(x =>
+                x.FileName.Contains(term) ||
+                x.Module.Title.Contains(term));
         }
 
-        public async Task<PagedResult<Document>> GetPagedAsync(PagedRequest request)
+        query = request.SortBy?.ToLower() switch
         {
-            var query = _context.Documents
-                .Where(x => !x.IsDeleted)
-                .Include(x => x.Module)
-                .AsNoTracking();
+            "filename" => request.SortOrder == "desc"
+                ? query.OrderByDescending(x => x.FileName)
+                : query.OrderBy(x => x.FileName),
+            "modulename" => request.SortOrder == "desc"
+                ? query.OrderByDescending(x => x.Module.Title)
+                : query.OrderBy(x => x.Module.Title),
+            _ => query.OrderByDescending(x => x.CreatedOn)
+        };
 
-            // 🔎 Search
-            if (!string.IsNullOrWhiteSpace(request.Search))
-            {
-                var term = request.Search.Trim();
+        var total = await query.CountAsync();
 
-                query = query.Where(x =>
-                    x.FileName.Contains(term) ||
-                    x.Module.Title.Contains(term));
-            }
+        var items = await query
+            .Skip((request.Page - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .ToListAsync();
 
-            // 🔀 Sorting
-            if (!string.IsNullOrEmpty(request.SortBy))
-            {
-                switch (request.SortBy.ToLower())
-                {
-                    case "filename":
-                        query = request.SortOrder == "desc"
-                            ? query.OrderByDescending(x => x.FileName)
-                            : query.OrderBy(x => x.FileName);
-                        break;
+        return new PagedResult<Document>(items, total);
+    }
 
-                    case "modulename":
-                        query = request.SortOrder == "desc"
-                            ? query.OrderByDescending(x => x.Module.Title)
-                            : query.OrderBy(x => x.Module.Title);
-                        break;
+    public async Task<List<Document>> GetByModuleAsync(Guid moduleId)
+    {
+        return await _dbSet
+            .Include(m => m.Module)
+            .Where(x => !x.IsDeleted && x.ModuleId == moduleId)
+            .AsNoTracking()
+            .ToListAsync();
+    }
 
-                    default:
-                        query = query.OrderByDescending(x => x.CreatedOn);
-                        break;
-                }
-            }
-            else
-            {
-                query = query.OrderByDescending(x => x.CreatedOn);
-            }
-
-            var total = await query.CountAsync();
-
-            var items = await query
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToListAsync();
-
-            return new PagedResult<Document>(items, total);
-        }
-        public async Task<List<Document>> GetByModuleAsync(Guid moduleId)
-        {
-            return await _context.Documents.Include(m => m.Module)
-                .Where(x => !x.IsDeleted && x.ModuleId == moduleId)
-                .AsNoTracking()
-                .ToListAsync();
-        }
-
-        public async Task<List<Document>> GetByCourseWithTextAsync(Guid courseId)
-        {
-            return await _context.Documents
-                .Include(d => d.Module)
-                .Where(d => !d.IsDeleted
-                    && d.Module.CourseId == courseId
-                    && d.ExtractedText != null)
-                .AsNoTracking()
-                .ToListAsync();
-        }
+    public async Task<List<Document>> GetByCourseWithTextAsync(Guid moduleId)
+    {
+        return await _dbSet
+            .Include(d => d.Module)
+            .Where(d => !d.IsDeleted
+                && d.Module.Id == moduleId
+                && d.ExtractedText != null)
+            .AsNoTracking()
+            .ToListAsync();
     }
 }

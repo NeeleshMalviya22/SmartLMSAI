@@ -38,7 +38,7 @@ export default function CreateQuizModal({
           optionFilterProp="label"
           options={modules?.map((m: Module) => ({
             label: m.title,
-            value: m.id,
+            value: m.moduleId,
           }))}
         />
       </Form.Item>

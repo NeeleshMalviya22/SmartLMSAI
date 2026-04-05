@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartLMSAI.Application.Common;
 using SmartLMSAI.Application.DTOs.Enrollments;
 using SmartLMSAI.Application.Interfaces.IServices;
 using System.Security.Claims;
@@ -27,9 +28,7 @@ public class EnrollmentController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Enroll(EnrollCourseDto dto)
     {
-        var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!Guid.TryParse(userIdValue, out var userId))
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
             return Unauthorized();
 
         return Ok(await _service.EnrollAsync(dto, userId));

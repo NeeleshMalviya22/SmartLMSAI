@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using SmartLMSAI.Application.Common;
 using System.Linq.Expressions;
+
+namespace SmartLMSAI.Infrastructure.Common;
 
 public static class QueryableExtensions
 {
@@ -34,21 +37,11 @@ public static class QueryableExtensions
         return sortBy switch
         {
             "title" => sortOrder == "desc"
-                ? query.OrderByDescending(e => EF.Property<object>(e, "Title"))
-                : query.OrderBy(e => EF.Property<object>(e, "Title")),
-
-            "modules" => sortOrder == "desc"
-                ? query.OrderByDescending(e => EF.Property<object>(e, "Modules"))
-                : query.OrderBy(e => EF.Property<object>(e, "Modules")),
-
-            "learners" => sortOrder == "desc"
-                ? query.OrderByDescending(e => EF.Property<object>(e, "Learners"))
-                : query.OrderBy(e => EF.Property<object>(e, "Learners")),
-
+                ? query.OrderByDescending(e => EF.Property<object>(e!, "Title"))
+                : query.OrderBy(e => EF.Property<object>(e!, "Title")),
             "isactive" => sortOrder == "desc"
-                ? query.OrderByDescending(e => EF.Property<object>(e, "IsActive"))
-                : query.OrderBy(e => EF.Property<object>(e, "IsActive")),
-
+                ? query.OrderByDescending(e => EF.Property<object>(e!, "IsActive"))
+                : query.OrderBy(e => EF.Property<object>(e!, "IsActive")),
             _ => query
         };
     }

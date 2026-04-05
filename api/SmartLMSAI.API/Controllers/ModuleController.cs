@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartLMSAI.Application.Common;
 using SmartLMSAI.Application.DTOs.Modules;
 using SmartLMSAI.Application.Interfaces.IServices;
 using System.Security.Claims;
+
+namespace SmartLMSAI.API.Controllers;
 
 [ApiController]
 [Route("api/modules")]
@@ -31,38 +34,18 @@ public class ModuleController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateModuleDto dto)
     {
-        var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!Guid.TryParse(userIdValue, out var userId))
-        {
-            return Unauthorized();
-        }
-
         return Ok(await _service.CreateAsync(dto));
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(Guid id, CreateModuleDto dto)
     {
-        var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!Guid.TryParse(userIdValue, out var userId))
-        {
-            return Unauthorized();
-        }
-        return Ok(await _service.UpdateAsync(userId, dto));
+        return Ok(await _service.UpdateAsync(id, dto));
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
         return Ok(await _service.DeleteAsync(id));
-    }
-
-    [HttpGet("{courseId}")]
-    public async Task<IActionResult> GetModuleByCourseAsync(Guid courseId)
-    {
-        var result = await _service.GetModuleByCourseAsync(courseId);
-        return Ok(result);
     }
 }

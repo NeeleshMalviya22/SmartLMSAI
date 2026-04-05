@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SmartLMSAI.Application.Common;
 using SmartLMSAI.Application.DTOs.Auth;
-using SmartLMSAI.Application.Interfaces.Repositories;
-using SmartLMSAI.Application.Interfaces.Services;
+using SmartLMSAI.Application.Interfaces.IRepositories;
+using SmartLMSAI.Application.Interfaces.IServices;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace SmartLMSAI.Application.Service;
+namespace SmartLMSAI.Infrastructure.Service;
 
 public class AuthService : IAuthService
 {
@@ -27,13 +27,9 @@ public class AuthService : IAuthService
     public async Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterRequestDto dto)
     {
         if (await _userRepository.UserExistsAsync(dto.Email))
-        {
             return ApiResponse<AuthResponseDto>.Fail("User already exists");
-        }
 
-        var userId = await _userRepository.CreateUserAsync(
-            dto.Email, dto.Password, dto.FullName);
-
+        var userId = await _userRepository.CreateUserAsync(dto.Email, dto.Password, dto.FullName);
         await _userRepository.AddUserToRoleAsync(userId, dto.Role);
 
         return ApiResponse<AuthResponseDto>.Ok(new AuthResponseDto
@@ -48,9 +44,7 @@ public class AuthService : IAuthService
     {
         var userId = await _userRepository.ValidateUserAsync(dto.Email, dto.Password);
         if (userId == null)
-        {
             return ApiResponse<AuthResponseDto>.Fail("Invalid credentials");
-        }
 
         var roles = await _userRepository.GetRolesAsync(userId.Value);
         var role = roles.FirstOrDefault() ?? string.Empty;

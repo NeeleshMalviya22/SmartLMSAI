@@ -1,5 +1,5 @@
-import { Modal, Form, Input, InputNumber, Select, Upload, Button } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { Modal, Form, Input, InputNumber, Select, Upload, Button, Tooltip, Switch } from "antd";
+import { InfoCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import type { Course } from "../../types/types";
 import type { CreateModuleModalProps } from "../../types/modals";
 
@@ -64,26 +64,27 @@ export default function CreateModuleModal({
           <Input.TextArea />
         </Form.Item>
 
-        {/* Order */}
         <Form.Item
-          name="order"
-          label="Order"
-          rules={[{ required: true }]}
+          label={
+            <span className="text-sm font-medium">
+              Active Status{" "}
+              <Tooltip title="Enable or disable this course for learners">
+                <InfoCircleOutlined className="text-gray-400 ml-1" />
+              </Tooltip>
+            </span>
+          }
+          name="isActive"
+          valuePropName="checked"
+          initialValue={true}
         >
-          <InputNumber style={{ width: "100%" }} />
+          <div className="flex items-center gap-4 mt-2">
+            <Switch />
+            <span className="text-gray-500 text-sm">
+              Module visible to learners
+            </span>
+          </div>
         </Form.Item>
 
-        {/* 📄 Upload Documents */}
-        <Form.Item
-          name="documents"
-          label="Upload Documents"
-          valuePropName="fileList"
-          getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
-        >
-          <Upload multiple beforeUpload={() => false}>
-            <Button icon={<UploadOutlined />}>Upload PDF</Button>
-          </Upload>
-        </Form.Item>
 
       </Form>
     </Modal>

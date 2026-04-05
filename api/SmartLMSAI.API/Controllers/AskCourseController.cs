@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartLMSAI.Application.DTOs.AskCourse;
-using SmartLMSAI.Application.Interfaces;
+using SmartLMSAI.Application.Interfaces.IServices;
 
 namespace SmartLMSAI.API.Controllers;
 
 [ApiController]
-[Route("api/aREMOVED")]
+[Route("api/ask-course")]
 [Authorize]
 public class AskCourseController : ControllerBase
 {

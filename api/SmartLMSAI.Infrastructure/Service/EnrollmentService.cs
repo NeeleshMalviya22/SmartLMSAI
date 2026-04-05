@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using SmartLMSAI.Application.Common;
 using SmartLMSAI.Application.DTOs.Enrollments;
 using SmartLMSAI.Application.Interfaces.IRepositories;
@@ -24,7 +23,6 @@ public class EnrollmentService : IEnrollmentService
     public async Task<PagedResult<EnrollmentDto>> GetEnrollmentsAsync(PagedRequest request)
     {
         var paged = await _repo.GetEnrollmentsAsync(request);
-
         var users = await _userManager.GetUsersInRoleAsync("LEARNER");
 
         var mapped = new List<EnrollmentDto>();
@@ -34,6 +32,7 @@ public class EnrollmentService : IEnrollmentService
             var enrollments = paged.Items
                 .Where(e => e.LearnerId == user.Id)
                 .ToList();
+
             if (enrollments.Any())
             {
                 foreach (var enrollment in enrollments)
@@ -65,6 +64,7 @@ public class EnrollmentService : IEnrollmentService
 
         return new PagedResult<EnrollmentDto>(mapped, mapped.Count);
     }
+
     public async Task<ApiResponse<Guid>> EnrollAsync(EnrollCourseDto dto, Guid userId)
     {
         var entity = new Enrollment

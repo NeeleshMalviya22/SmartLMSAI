@@ -18,9 +18,7 @@ public class PdfTextExtractorService : IPdfTextExtractor
             var page = pdfDoc.GetPage(i);
             var text = iText.Kernel.Pdf.Canvas.Parser.PdfTextExtractor.GetTextFromPage(page);
             if (!string.IsNullOrWhiteSpace(text))
-            {
                 sb.AppendLine(text);
-            }
         }
 
         return Task.FromResult(sb.ToString().Trim());

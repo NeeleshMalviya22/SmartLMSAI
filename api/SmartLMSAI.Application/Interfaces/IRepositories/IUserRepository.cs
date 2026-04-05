@@ -1,4 +1,4 @@
-﻿namespace SmartLMSAI.Application.Interfaces.Repositories;
+namespace SmartLMSAI.Application.Interfaces.IRepositories;
 
 public interface IUserRepository
 {

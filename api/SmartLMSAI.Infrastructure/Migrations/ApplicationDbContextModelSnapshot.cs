@@ -168,6 +168,9 @@ namespace SmartLMSAI.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("EnrollmentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -185,6 +188,8 @@ namespace SmartLMSAI.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EnrollmentId");
 
                     b.ToTable("Courses");
                 });
@@ -321,47 +326,6 @@ namespace SmartLMSAI.Infrastructure.Migrations
                     b.HasIndex("CourseId");
 
                     b.ToTable("Modules");
-                });
-
-            modelBuilder.Entity("SmartLMSAI.Domain.Entities.ModuleProgress", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CompletedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("LearnerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("ModuleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ModuleId");
-
-                    b.ToTable("ModuleProgress");
                 });
 
             modelBuilder.Entity("SmartLMSAI.Domain.Entities.Question", b =>
@@ -509,55 +473,6 @@ namespace SmartLMSAI.Infrastructure.Migrations
                     b.ToTable("Quizzes");
                 });
 
-            modelBuilder.Entity("SmartLMSAI.Domain.Entities.QuizAttempt", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("AttemptDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CorrectAnswers")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("LearnerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Passed")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("QuizId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Score")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalQuestions")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuizId");
-
-                    b.ToTable("QuizAttempts");
-                });
-
             modelBuilder.Entity("SmartLMSAI.Infrastructure.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -682,6 +597,13 @@ namespace SmartLMSAI.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SmartLMSAI.Domain.Entities.Course", b =>
+                {
+                    b.HasOne("SmartLMSAI.Domain.Entities.Enrollment", null)
+                        .WithMany("Courses")
+                        .HasForeignKey("EnrollmentId");
+                });
+
             modelBuilder.Entity("SmartLMSAI.Domain.Entities.Document", b =>
                 {
                     b.HasOne("SmartLMSAI.Domain.Entities.Module", "Module")
@@ -713,17 +635,6 @@ namespace SmartLMSAI.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Course");
-                });
-
-            modelBuilder.Entity("SmartLMSAI.Domain.Entities.ModuleProgress", b =>
-                {
-                    b.HasOne("SmartLMSAI.Domain.Entities.Module", "Module")
-                        .WithMany()
-                        .HasForeignKey("ModuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Module");
                 });
 
             modelBuilder.Entity("SmartLMSAI.Domain.Entities.Question", b =>
@@ -767,20 +678,14 @@ namespace SmartLMSAI.Infrastructure.Migrations
                     b.Navigation("Module");
                 });
 
-            modelBuilder.Entity("SmartLMSAI.Domain.Entities.QuizAttempt", b =>
-                {
-                    b.HasOne("SmartLMSAI.Domain.Entities.Quiz", "Quiz")
-                        .WithMany()
-                        .HasForeignKey("QuizId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Quiz");
-                });
-
             modelBuilder.Entity("SmartLMSAI.Domain.Entities.Course", b =>
                 {
                     b.Navigation("Modules");
+                });
+
+            modelBuilder.Entity("SmartLMSAI.Domain.Entities.Enrollment", b =>
+                {
+                    b.Navigation("Courses");
                 });
 
             modelBuilder.Entity("SmartLMSAI.Domain.Entities.Question", b =>

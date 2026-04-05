@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartLMSAI.Application.DTOs.Auth;
-using SmartLMSAI.Application.Interfaces.Services;
+using SmartLMSAI.Application.Interfaces.IServices;
 
 namespace SmartLMSAI.API.Controllers;
 

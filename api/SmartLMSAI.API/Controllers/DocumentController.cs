@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartLMSAI.Application.Common;
 using SmartLMSAI.Application.DTOs.Document;
-using SmartLMSAI.Application.Interfaces;
+using SmartLMSAI.Application.Interfaces.IServices;
 using System.Security.Claims;
 
 namespace SmartLMSAI.API.Controllers;
@@ -27,13 +28,10 @@ public class DocumentController : ControllerBase
     [HttpPost("upload")]
     public async Task<IActionResult> Upload([FromForm] UploadDocumentDto dto)
     {
-        var userId = Guid.Parse(
-            User.FindFirstValue(ClaimTypes.NameIdentifier)!
-        );
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            return Unauthorized();
 
-        var id = await _service.UploadAsync(dto, userId);
-
-        return Ok(id);
+        return Ok(await _service.UploadAsync(dto, userId));
     }
 
     [HttpDelete("{id}")]

@@ -1,10 +1,10 @@
-﻿using CloudinaryDotNet;
+using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using SmartLMSAI.Application.Interfaces.IRepositories;
 
-namespace SmartLMSAI.Infrastructure.Services;
+namespace SmartLMSAI.Infrastructure.Service;
 
 public class CloudinaryService : ICloudinaryService
 {

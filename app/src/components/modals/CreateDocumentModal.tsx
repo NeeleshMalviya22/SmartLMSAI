@@ -26,10 +26,11 @@ export default function CreateDocumentModal({
           placeholder="Select Module"
           options={modules?.map((m: Module) => ({
             label: m.title,
-            value: m.id
+            value: m.moduleId,
           }))}
         />
       </Form.Item>
+
       <Form.Item
         name="file"
         label="PDF File"
@@ -51,7 +52,6 @@ export default function CreateDocumentModal({
           </div>
         </Upload>
       </Form.Item>
-
     </FormModal>
   );
 }

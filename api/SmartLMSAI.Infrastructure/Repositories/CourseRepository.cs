@@ -1,19 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using SmartLMSAI.Application.Common;
 using SmartLMSAI.Application.DTOs.Courses;
-using SmartLMSAI.Application.Interfaces;
+using SmartLMSAI.Application.Interfaces.IRepositories;
 using SmartLMSAI.Domain.Entities;
-using SmartLMSAI.Infrastructure;
+
+namespace SmartLMSAI.Infrastructure.Repositories;
 
 public class CourseRepository : BaseRepository<Course>, ICourseRepository
 {
-
-    public CourseRepository(ApplicationDbContext context) : base(context)
-    {
-    }
+    public CourseRepository(ApplicationDbContext context) : base(context) { }
 
     public async Task<PagedResult<CourseDetailsDto>> GetCoursesAsync(PagedRequest request)
     {
-        var query = _context.Courses.Include(x => x.Modules).Where(x => x.IsDeleted != true).AsNoTracking().AsQueryable();
+        var query = _dbSet
+            .Where(x => !x.IsDeleted)
+            .Include(x => x.Modules)
+            .AsNoTracking()
+            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
@@ -21,32 +24,16 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
             query = query.Where(c => c.Title.Contains(term));
         }
 
-        if (!string.IsNullOrEmpty(request.SortBy))
+        query = request.SortBy?.ToLower() switch
         {
-            switch (request.SortBy.ToLower())
-            {
-                case "title":
-                    query = request.SortOrder == "desc"
-                        ? query.OrderByDescending(c => c.Title)
-                        : query.OrderBy(c => c.Title);
-                    break;
-
-                case "isactive":
-                    query = request.SortOrder == "desc"
-                        ? query.OrderByDescending(c => c.IsActive)
-                        : query.OrderBy(c => c.IsActive);
-                    break;
-
-
-                default:
-                    query = query.OrderByDescending(c => c.Id);
-                    break;
-            }
-        }
-        else
-        {
-            query = query.OrderByDescending(c => c.Id);
-        }
+            "title" => request.SortOrder == "desc"
+                ? query.OrderByDescending(c => c.Title)
+                : query.OrderBy(c => c.Title),
+            "isactive" => request.SortOrder == "desc"
+                ? query.OrderByDescending(c => c.IsActive)
+                : query.OrderBy(c => c.IsActive),
+            _ => query.OrderByDescending(c => c.CreatedOn)
+        };
 
         var totalCount = await query.CountAsync();
 
@@ -62,13 +49,29 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                 CreatedOn = c.CreatedOn.ToString("dd MMM yyyy"),
                 ModuleCount = c.Modules.Count(m => !m.IsDeleted),
                 LearnerCount = 0,
-                ModuleNames = string.Join(", ",c.Modules
-                                                .Where(m => !m.IsDeleted)
-                                                .Select(m => m.Title))
+                ModuleNames = string.Join(", ", c.Modules
+                    .Where(m => !m.IsDeleted)
+                    .Select(m => m.Title))
             })
-            .AsNoTracking()
             .ToListAsync();
 
         return new PagedResult<CourseDetailsDto>(items, totalCount);
+    }
+
+    public async Task<List<Course>> GetAllActiveWithModulesAsync()
+    {
+        return await _dbSet
+            .Where(c => !c.IsDeleted && c.IsActive)
+            .Include(c => c.Modules)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<Course?> GetByIdWithModulesAsync(Guid id)
+    {
+        return await _dbSet
+            .Include(c => c.Modules)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
     }
 }

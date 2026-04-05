@@ -3,17 +3,11 @@ using SmartLMSAI.Application.Interfaces.IServices;
 using System.Text;
 using System.Text.Json;
 
-public class AiService : IAiService
+public class AiService(IConfiguration config, HttpClient httpClient) : IAiService
 {
-    private readonly string _apiKey;
+    private readonly string _apiKey = config["Groq:ApiKey"] ?? throw new Exception("Groq API Key missing");
     private readonly string _model;
-    private readonly HttpClient _httpClient;
-
-    public AiService(IConfiguration config, HttpClient httpClient)
-    {
-        _apiKey = config["Groq:ApiKey"] ?? throw new Exception("Groq API Key missing");
-        _httpClient = httpClient;
-    }
+    private readonly HttpClient _httpClient = httpClient;
 
     public async Task<string> AskAsync(string question, List<string> context)
     {
@@ -35,9 +29,8 @@ public class AiService : IAiService
         };
 
         var json = JsonSerializer.Serialize(requestBody);
-        var apikey = "";
         _httpClient.DefaultRequestHeaders.Clear();
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apikey}");
+        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");
 
         var response = await _httpClient.PostAsync(
             "https://api.groq.com/openai/v1/chat/completions",

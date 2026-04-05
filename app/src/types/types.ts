@@ -31,15 +31,19 @@ export interface Course {
 }
 
 export interface Module {
-  id: number;
+  moduleId: string;   // ✅ GUID
   title: string;
-  courseId: number;
+  courseId: string;   // ✅ GUID
+  description?: string;
+  isActive?: boolean;
+  createdOn?: string;
+  tittle?: string;
 }
 
 export interface DocumentItem {
   id: number;
   fileName: string;
-  moduleId: number;
+  moduleId: string;
   moduleName?: string;
   createdOn?: string;
 }

@@ -21,7 +21,7 @@ export const askCourseApi = async (
   request: AskCourseRequest
 ): Promise<ApiWrapped<AskCourseResponse>> => {
   const res = await apiClient.post<ApiWrapped<AskCourseResponse>>(
-    "aREMOVED",
+    "ask-course",
     request
   );
   return res.data;

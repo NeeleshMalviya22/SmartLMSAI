@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SmartLMSAI.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using SmartLMSAI.Application.Interfaces.IRepositories;
 
-public class BaseRepository<T> where T : class
+namespace SmartLMSAI.Infrastructure.Repositories;
+
+public class BaseRepository<T> : IBaseRepository<T> where T : class
 {
     protected readonly ApplicationDbContext _context;
     protected readonly DbSet<T> _dbSet;

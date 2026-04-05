@@ -1,13 +1,12 @@
-﻿using SmartLMSAI.Application.DTOs.Courses;
+using SmartLMSAI.Application.Common;
+using SmartLMSAI.Application.DTOs.Courses;
 using SmartLMSAI.Domain.Entities;
 
-public interface ICourseRepository
+namespace SmartLMSAI.Application.Interfaces.IRepositories;
+
+public interface ICourseRepository : IBaseRepository<Course>
 {
-    Task AddAsync(Course course);
-    Task<Course?> GetByIdAsync(Guid id);
-    Task<List<Course>> GetAllAsync();
-    void Update(Course course);
-    void Delete(Course course);
-    Task SaveChangesAsync();
     Task<PagedResult<CourseDetailsDto>> GetCoursesAsync(PagedRequest request);
+    Task<List<Course>> GetAllActiveWithModulesAsync();
+    Task<Course?> GetByIdWithModulesAsync(Guid id);
 }

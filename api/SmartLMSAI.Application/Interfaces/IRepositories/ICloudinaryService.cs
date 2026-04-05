@@ -1,14 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
-namespace SmartLMSAI.Application.Interfaces.IRepositories
+namespace SmartLMSAI.Application.Interfaces.IRepositories;
+
+public interface ICloudinaryService
 {
-    public interface ICloudinaryService
-    {
-        Task<string> UploadFileAsync(IFormFile file);
-    }
+    Task<string> UploadFileAsync(IFormFile file);
 }

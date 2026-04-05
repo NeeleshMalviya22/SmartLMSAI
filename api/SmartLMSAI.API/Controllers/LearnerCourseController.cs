@@ -18,6 +18,11 @@ public class LearnerCourseController : ControllerBase
         _service = service;
     }
 
+    private Guid? GetUserId()
+    {
+        var val = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Guid.TryParse(val, out var id) ? id : null;
+    }
 
     [HttpGet("courses")]
     public async Task<IActionResult> GetCourses()
@@ -63,12 +68,5 @@ public class LearnerCourseController : ControllerBase
         var userId = GetUserId();
         if (userId == null) return Unauthorized();
         return Ok(await _service.SubmitQuizAsync(dto, userId.Value));
-    }
-
-
-    private Guid? GetUserId()
-    {
-        var val = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return Guid.TryParse(val, out var id) ? id : null;
     }
 }

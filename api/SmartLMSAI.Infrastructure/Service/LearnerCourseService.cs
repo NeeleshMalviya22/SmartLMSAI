@@ -1,55 +1,56 @@
-using Microsoft.EntityFrameworkCore;
 using SmartLMSAI.Application.Common;
 using SmartLMSAI.Application.DTOs.Progress;
 using SmartLMSAI.Application.DTOs.QuizAttempt;
+using SmartLMSAI.Application.Interfaces.IRepositories;
 using SmartLMSAI.Application.Interfaces.IServices;
 using SmartLMSAI.Domain.Entities;
-using System.Reflection;
 
 namespace SmartLMSAI.Infrastructure.Service;
 
 public class LearnerCourseService : ILearnerCourseService
 {
-    private readonly ApplicationDbContext _db;
+    private readonly ICourseRepository _courseRepo;
+    private readonly IEnrollmentRepository _enrollmentRepo;
+    private readonly IModuleProgressRepository _progressRepo;
+    private readonly IQuizRepository _quizRepo;
+    private readonly IQuestionRepository _questionRepo;
+    private readonly IQuizAttemptRepository _attemptRepo;
 
-    public LearnerCourseService(ApplicationDbContext db)
+    public LearnerCourseService(
+        ICourseRepository courseRepo,
+        IEnrollmentRepository enrollmentRepo,
+        IModuleProgressRepository progressRepo,
+        IQuizRepository quizRepo,
+        IQuestionRepository questionRepo,
+        IQuizAttemptRepository attemptRepo)
     {
-        _db = db;
+        _courseRepo = courseRepo;
+        _enrollmentRepo = enrollmentRepo;
+        _progressRepo = progressRepo;
+        _quizRepo = quizRepo;
+        _questionRepo = questionRepo;
+        _attemptRepo = attemptRepo;
     }
 
     public async Task<ApiResponse<List<CourseProgressDto>>> GetAllCoursesForLearnerAsync(Guid learnerId)
     {
-        var courses = await _db.Courses
-            .Where(c => !c.IsDeleted && c.IsActive)
-            .Include(c => c.Modules)
-            .AsNoTracking()
-            .ToListAsync();
+        var activeCourses = await _courseRepo.GetAllActiveWithModulesAsync();
 
-        var enrollments = await _db.Enrollments
-            .Where(e => e.LearnerId == learnerId && !e.IsDeleted)
-            .ToListAsync();
+        var progress = await _progressRepo.GetByLearnerAsync(learnerId);
 
-        var progress = await _db.ModuleProgress
-            .Where(p => p.LearnerId == learnerId && !p.IsDeleted)
-        .ToListAsync();
+        var enrollments = await _progressRepo.GetActiveByLearnerAsync(learnerId);
 
-        var moduleDtos = courses.Select(m =>
+        var enrolledCourseIds = enrollments.Select(e => e.CourseId).ToHashSet();
+
+        var result = activeCourses.Select(c =>
         {
-            var isCompleted = progress.Any(p => p.ModuleId == m.Id && p.Status == "COMPLETED");
+            var modules = c.Modules
+                .Where(m => !m.IsDeleted && m.IsActive)
+                .OrderBy(m => m.OrderIndex)
+                .ToList();
 
-            return new ModuleProgressDto
-            {
-                ModuleId = m.Id,
-                Title = m.Title,
-                Status = isCompleted ? "Completed" : "Not Started"
-            };
-        }).ToList();
-
-        var result = courses.Select(c =>
-        {
-            var modules = c.Modules.Where(m => !m.IsDeleted && m.IsActive).OrderBy(m => m.OrderIndex).ToList();
-            var isEnrolled = enrollments.Any(e => e.CourseId == c.Id);
-            var completedCount = modules.Count(m => progress.Any(p => p.ModuleId == m.Id && p.Status == "COMPLETED"));
+            var completedCount = modules.Count(m =>
+                progress.Any(p => p.ModuleId == m.Id && p.Status == "COMPLETED"));
             var totalModules = modules.Count;
 
             return new CourseProgressDto
@@ -57,12 +58,13 @@ public class LearnerCourseService : ILearnerCourseService
                 CourseId = c.Id,
                 CourseTitle = c.Title,
                 Description = c.Description,
-                IsEnrolled = isEnrolled,
+                IsEnrolled = enrolledCourseIds.Contains(c.Id),
                 TotalModules = totalModules,
                 CompletedModules = completedCount,
-                ProgressPercent = totalModules > 0 ? (int)Math.Round((double)completedCount / totalModules * 100) : 0,
-                AllModulesCompleted = totalModules > 0 && completedCount == totalModules,
-                Modules = moduleDtos
+                ProgressPercent = totalModules > 0
+                    ? (int)Math.Round((double)completedCount / totalModules * 100)
+                    : 0,
+                AllModulesCompleted = totalModules > 0 && completedCount == totalModules
             };
         }).ToList();
 
@@ -71,43 +73,37 @@ public class LearnerCourseService : ILearnerCourseService
 
     public async Task<ApiResponse<CourseProgressDto>> GetCourseDetailsForLearnerAsync(Guid courseId, Guid learnerId)
     {
-        var course = await _db.Courses
-            .Include(c => c.Modules)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == courseId && !c.IsDeleted);
+        var course = await _courseRepo.GetByIdWithModulesAsync(courseId);
 
         if (course == null)
             return ApiResponse<CourseProgressDto>.Fail("Course not found");
 
-        var isEnrolled = await _db.Enrollments
-            .AnyAsync(e => e.CourseId == courseId && e.LearnerId == learnerId && !e.IsDeleted);
+        var isEnrolled = await _enrollmentRepo.ExistsAsync(courseId, learnerId);
+        var progressList = await _progressRepo.GetByLearnerAsync(learnerId);
 
-        var progressList = await _db.ModuleProgress
-            .Where(p => p.LearnerId == learnerId && !p.IsDeleted)
-            .ToListAsync();
-
-        var quizzes = await _db.Quizzes
-            .Where(q => !q.IsDeleted && q.IsActive)
-            .ToListAsync();
-
-        var modules = course.Modules
+        var activeModules = course.Modules
             .Where(m => !m.IsDeleted && m.IsActive)
             .OrderBy(m => m.OrderIndex)
-            .Select(m =>
+            .ToList();
+
+        var moduleIds = activeModules.Select(m => m.Id).ToList();
+        var quizzes = await _quizRepo.GetActiveByModuleIdsAsync(moduleIds);
+
+        var modules = activeModules.Select(m =>
+        {
+            var mp = progressList.FirstOrDefault(p => p.ModuleId == m.Id);
+            var quiz = quizzes.FirstOrDefault(q => q.ModuleId == m.Id);
+            return new ModuleProgressDto
             {
-                var mp = progressList.FirstOrDefault(p => p.ModuleId == m.Id);
-                var quiz = quizzes.FirstOrDefault(q => q.ModuleId == m.Id);
-                return new ModuleProgressDto
-                {
-                    ModuleId = m.Id,
-                    Title = m.Title,
-                    Description = m.Description,
-                    OrderIndex = m.OrderIndex,
-                    Status = mp?.Status ?? "NOT_STARTED",
-                    HasQuiz = quiz != null,
-                    QuizId = quiz?.Id
-                };
-            }).ToList();
+                ModuleId = m.Id,
+                Title = m.Title,
+                Description = m.Description,
+                OrderIndex = m.OrderIndex,
+                Status = mp?.Status ?? "NOT_STARTED",
+                HasQuiz = quiz != null,
+                QuizId = quiz?.Id
+            };
+        }).ToList();
 
         var completedCount = modules.Count(m => m.Status == "COMPLETED");
         var totalModules = modules.Count;
@@ -120,7 +116,9 @@ public class LearnerCourseService : ILearnerCourseService
             IsEnrolled = isEnrolled,
             TotalModules = totalModules,
             CompletedModules = completedCount,
-            ProgressPercent = totalModules > 0 ? (int)Math.Round((double)completedCount / totalModules * 100) : 0,
+            ProgressPercent = totalModules > 0
+                ? (int)Math.Round((double)completedCount / totalModules * 100)
+                : 0,
             AllModulesCompleted = totalModules > 0 && completedCount == totalModules,
             Modules = modules
         };
@@ -130,13 +128,12 @@ public class LearnerCourseService : ILearnerCourseService
 
     public async Task<ApiResponse<bool>> EnrollAsync(Guid courseId, Guid learnerId)
     {
-        var exists = await _db.Enrollments
-            .AnyAsync(e => e.CourseId == courseId && e.LearnerId == learnerId && !e.IsDeleted);
+        var exists = await _enrollmentRepo.ExistsAsync(courseId, learnerId);
 
         if (exists)
             return ApiResponse<bool>.Fail("Already enrolled in this course");
 
-        _db.Enrollments.Add(new Enrollment
+        var enrollment = new Enrollment
         {
             Id = Guid.NewGuid(),
             CourseId = courseId,
@@ -144,16 +141,17 @@ public class LearnerCourseService : ILearnerCourseService
             Status = "ACTIVE",
             CreatedOn = DateTime.UtcNow,
             CreatedBy = learnerId
-        });
+        };
 
-        await _db.SaveChangesAsync();
+        await _enrollmentRepo.AddAsync(enrollment);
+        await _enrollmentRepo.SaveChangesAsync();
+
         return ApiResponse<bool>.Ok(true, "Enrolled successfully");
     }
 
     public async Task<ApiResponse<bool>> MarkModuleCompleteAsync(Guid moduleId, Guid learnerId)
     {
-        var existing = await _db.ModuleProgress
-            .FirstOrDefaultAsync(p => p.ModuleId == moduleId && p.LearnerId == learnerId && !p.IsDeleted);
+        var existing = await _progressRepo.GetByModuleAndLearnerAsync(moduleId, learnerId);
 
         if (existing != null)
         {
@@ -163,7 +161,7 @@ public class LearnerCourseService : ILearnerCourseService
         }
         else
         {
-            _db.ModuleProgress.Add(new ModuleProgress
+            var progress = new ModuleProgress
             {
                 Id = Guid.NewGuid(),
                 ModuleId = moduleId,
@@ -172,29 +170,22 @@ public class LearnerCourseService : ILearnerCourseService
                 CompletedOn = DateTime.UtcNow,
                 CreatedOn = DateTime.UtcNow,
                 CreatedBy = learnerId
-            });
+            };
+            await _progressRepo.AddAsync(progress);
         }
 
-        await _db.SaveChangesAsync();
+        await _progressRepo.SaveChangesAsync();
         return ApiResponse<bool>.Ok(true);
     }
 
     public async Task<ApiResponse<QuizWithQuestionsDto>> GetQuizForAttemptAsync(Guid quizId)
     {
-        var quiz = await _db.Quizzes
-            .AsNoTracking()
-            .FirstOrDefaultAsync(q => q.Id == quizId && !q.IsDeleted && q.IsActive);
+        var quiz = await _quizRepo.GetActiveByIdAsync(quizId);
 
         if (quiz == null)
             return ApiResponse<QuizWithQuestionsDto>.Fail("Quiz not found");
 
-        var questions = await _db.Questions
-            .Include(q => q.Options)
-            .Include(q => q.QuestionType)
-            .Where(q => q.QuizId == quizId && !q.IsDeleted)
-            .OrderBy(q => q.OrderIndex)
-            .AsNoTracking()
-            .ToListAsync();
+        var questions = await _questionRepo.GetByQuizIdWithOptionsAsync(quizId);
 
         var dto = new QuizWithQuestionsDto
         {
@@ -202,18 +193,22 @@ public class LearnerCourseService : ILearnerCourseService
             Title = quiz.Title,
             Description = quiz.Description,
             PassingScore = quiz.PassingScore,
-            Questions = questions.Select(q => new QuizQuestionDto
-            {
-                QuestionId = q.Id,
-                QuestionText = q.QuestionText,
-                QuestionType = q.QuestionType?.TypeName ?? "MULTIPLE_CHOICE",
-                OrderIndex = q.OrderIndex,
-                Options = q.Options.Where(o => !o.IsDeleted).Select(o => new QuizOptionDto
+            Questions = questions
+                .OrderBy(q => q.OrderIndex)
+                .Select(q => new QuizQuestionDto
                 {
-                    OptionId = o.Id,
-                    OptionText = o.OptionText
+                    QuestionId = q.Id,
+                    QuestionText = q.QuestionText,
+                    QuestionType = q.QuestionType?.TypeName ?? "MULTIPLE_CHOICE",
+                    OrderIndex = q.OrderIndex,
+                    Options = q.Options
+                        .Where(o => !o.IsDeleted)
+                        .Select(o => new QuizOptionDto
+                        {
+                            OptionId = o.Id,
+                            OptionText = o.OptionText
+                        }).ToList()
                 }).ToList()
-            }).ToList()
         };
 
         return ApiResponse<QuizWithQuestionsDto>.Ok(dto);
@@ -221,16 +216,12 @@ public class LearnerCourseService : ILearnerCourseService
 
     public async Task<ApiResponse<QuizAttemptResultDto>> SubmitQuizAsync(SubmitQuizDto dto, Guid learnerId)
     {
-        var quiz = await _db.Quizzes
-            .FirstOrDefaultAsync(q => q.Id == dto.QuizId && !q.IsDeleted);
+        var quiz = await _quizRepo.GetByIdAsync(dto.QuizId);
 
-        if (quiz == null)
+        if (quiz == null || quiz.IsDeleted)
             return ApiResponse<QuizAttemptResultDto>.Fail("Quiz not found");
 
-        var questions = await _db.Questions
-            .Include(q => q.Options)
-            .Where(q => q.QuizId == dto.QuizId && !q.IsDeleted)
-            .ToListAsync();
+        var questions = await _questionRepo.GetByQuizIdWithOptionsAsync(dto.QuizId);
 
         int correctCount = 0;
         foreach (var answer in dto.Answers)
@@ -244,10 +235,12 @@ public class LearnerCourseService : ILearnerCourseService
         }
 
         int totalQuestions = questions.Count;
-        int score = totalQuestions > 0 ? (int)Math.Round((double)correctCount / totalQuestions * 100) : 0;
+        int score = totalQuestions > 0
+            ? (int)Math.Round((double)correctCount / totalQuestions * 100)
+            : 0;
         bool passed = score >= quiz.PassingScore;
 
-        var attempt = new Domain.Entities.QuizAttempt
+        var attempt = new QuizAttempt
         {
             Id = Guid.NewGuid(),
             QuizId = dto.QuizId,
@@ -261,8 +254,8 @@ public class LearnerCourseService : ILearnerCourseService
             CreatedBy = learnerId
         };
 
-        _db.QuizAttempts.Add(attempt);
-        await _db.SaveChangesAsync();
+        await _attemptRepo.AddAsync(attempt);
+        await _attemptRepo.SaveChangesAsync();
 
         return ApiResponse<QuizAttemptResultDto>.Ok(new QuizAttemptResultDto
         {
